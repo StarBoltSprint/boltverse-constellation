@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 
-def largest_disc(bgr, luma_th=14):
+def largest_disc(bgr, luma_th=6):
     luma = bgr.max(axis=2)
     mask = (luma > luma_th).astype(np.uint8)
     n, labels, stats, cents = cv2.connectedComponentsWithStats(mask, 8)
@@ -19,7 +19,7 @@ def largest_disc(bgr, luma_th=14):
     ys, xs = np.where(labels == i)
     cx, cy = float(xs.mean()), float(ys.mean())
     d = np.sqrt((xs - cx) ** 2 + (ys - cy) ** 2)
-    r = float(np.percentile(d, 93))
+    r = float(np.percentile(d, 97))
     return cx, cy, max(r, 8.0)
 
 
@@ -46,7 +46,7 @@ def lock_frame(bgr, target_r, target_cx, target_cy):
     # soft circular window so a leftover ghost in the corner dies
     yy, xx = np.mgrid[0:h, 0:w]
     pr = np.sqrt((xx - target_cx) ** 2 + (yy - target_cy) ** 2)
-    inner, outer = target_r * 1.04, target_r * 1.18
+    inner, outer = target_r * 1.14, target_r * 1.32
     win = np.clip((outer - pr) / max(outer - inner, 1e-6), 0, 1).astype(np.float32)
     return np.clip(out.astype(np.float32) * win[..., None], 0, 255).astype(np.uint8)
 

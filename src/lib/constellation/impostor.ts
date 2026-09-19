@@ -41,8 +41,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.38,
-    halo: 0.46,
+    source: 0.388,
+    halo: 0.42,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.12,
@@ -228,18 +228,20 @@ void main() {
     face += uC * (spark - 0.5) * 0.05 * amt;
   }
 
-  float inSrc = 1.0 - smoothstep(source * 0.7, source * 1.2, pr);
-  vec3 rgb = mix(raw.rgb, face, inSrc * (1.0 - lod));
-  rgb = mix(rgb, raw.rgb, lod * 0.9);
+  // One sample only. Never stamp a second disc (inSrc mix = nested globe).
+  vec3 rgb = mix(raw.rgb, face, twist * 0.35 * (1.0 - lod));
+  rgb = mix(rgb, raw.rgb, lod * 0.85);
 
   float luma = max(rgb.r, max(rgb.g, rgb.b));
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
-  float starA = smoothstep(0.08, 0.22, luma);
-  float keyed = smoothstep(0.016, 0.045, luma);
-  float inBody = 1.0 - smoothstep(source * 0.86, source * 1.02, pr);
-  float keepDark = inBody * smoothstep(0.01, 0.028, luma);
-  float planetA = max(keyed, keepDark);
-  float a = mix(starA, planetA, step(0.5, uKind)) * window * uOpacity;
+  float starA = smoothstep(0.08, 0.22, luma) * window;
+
+  // Planets: silhouette is a disc. Night side stays opaque — never luma-key the interior.
+  float disc = 1.0 - smoothstep(source * 0.990, source * 1.012, pr);
+  float nz = clamp(nCam.z, 0.0, 1.0);
+  rgb *= mix(1.0, mix(0.72, 1.0, pow(nz, 0.45)), 0.28 * (1.0 - lod * 0.7));
+
+  float a = mix(starA, disc, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
 }
 `;
