@@ -29,8 +29,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.28,
-    halo: 0.48,
+    source: 0.255,
+    halo: 0.39,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.1,
@@ -186,7 +186,8 @@ void main() {
   float halo0 = uParams.y;
   float para = uParams.z;
   float lod = uParams.w;
-  float halo = mix(halo0, 0.52, lod);
+  // Stars may bloom on zoom. Planets must not — that grew a black plate.
+  float halo = uKind < 0.5 ? mix(halo0, 0.52, lod) : halo0;
 
   vec2 d = vUv - uCenter;
   float pr = length(d);
@@ -236,11 +237,11 @@ void main() {
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  // Perfect circle for the body. Bright bits in the halo (rings, shards) may stick out.
+  // Body is a disc. Void stays void. Rings/shards only if they are actually bright.
   float disc = 1.0 - smoothstep(source * 0.996, source * 1.004, pr);
-  float inHalo = 1.0 - smoothstep(halo * 0.90, halo, pr);
-  float lit = smoothstep(0.06, 0.14, luma);
-  float planetA = max(disc, (1.0 - disc) * lit * inHalo);
+  float inHalo = 1.0 - smoothstep(halo * 0.92, halo, pr);
+  float ring = smoothstep(0.24, 0.45, luma);
+  float planetA = max(disc, ring * inHalo);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);

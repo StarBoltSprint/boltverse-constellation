@@ -129,6 +129,22 @@
   height: 100%;
 }
 
+.tex-farm {
+  position: absolute;
+  left: -64px;
+  top: -64px;
+  width: 8px;
+  height: 8px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tex-farm video {
+  width: 8px;
+  height: 8px;
+}
+
 .has-impostor .node-media {
   opacity: 0 !important;
   visibility: hidden !important;
