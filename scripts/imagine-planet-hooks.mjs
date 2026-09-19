@@ -37,7 +37,7 @@ const WORLDS = {
   crystal: {
     kind: "spin",
     paint:
-      "The same ice-crystal body, rigid. Existing shards stay attached. The whole cluster rotates slowly as one solid around the vertical axis. Never becomes a smooth planet. Never grows new spikes. Never melts. Never a second globe. Full disc in frame. Locked tripod. Same size the whole time.",
+      "Icy terrestrial globe. Frozen white continents, dark oceans, thin cyan atmosphere on the limb. ONE globe filling most of the plate — the limb stays close to the edge. The same ice sheets travel around the sphere as surface texture. Full disc always in frame. Locked tripod: no zoom, no dolly. Same pixel radius the whole time. Never a second globe.",
   },
   hollow: {
     kind: "spin",

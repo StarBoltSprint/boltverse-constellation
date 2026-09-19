@@ -29,11 +29,11 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.248,
-    halo: 0.46,
+    source: 0.392,
+    halo: 0.5,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.11,
+    parallax: 0.07,
     kind: 1,
     a: [0.05, 0.22, 0.42],
     b: [0.16, 0.48, 0.22],
@@ -41,11 +41,11 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.312,
-    halo: 0.355,
-    cx: 0.5,
-    cy: 0.5,
-    parallax: 0.13,
+    source: 0.442,
+    halo: 0.49,
+    cx: 0.513,
+    cy: 0.51,
+    parallax: 0.08,
     kind: 2,
     a: [0.38, 0.14, 0.06],
     b: [0.78, 0.38, 0.16],
@@ -53,11 +53,11 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 8.1,
   },
   crystal: {
-    source: 0.13,
-    halo: 0.2,
+    source: 0.44,
+    halo: 0.49,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.1,
+    parallax: 0.08,
     kind: 3,
     a: [0.38, 0.52, 0.66],
     b: [0.78, 0.9, 0.98],
@@ -226,7 +226,7 @@ void main() {
   // Bump from fbm so canyons catch the light (no derivatives — Samsung safe).
   vec3 t1 = normalize(vec3(-nCam.z, 0.0, nCam.x));
   vec3 t2 = cross(nCam, t1);
-  nCam = normalize(nCam + (t1 * (grain - 0.5) + t2 * (crag - 0.5)) * 0.55 * onBody);
+  nCam = normalize(nCam + (t1 * (grain - 0.5) + t2 * (crag - 0.5)) * 0.22 * onBody);
 
   vec3 rgb = raw.rgb;
   if (uKind < 0.5) {
@@ -234,20 +234,20 @@ void main() {
     starFace += uC * (spark - 0.4) * 0.18 * twist * smoothstep(0.08, 0.26, rawLuma);
     rgb = mix(starFace, raw.rgb, lod * 0.8);
   } else {
-    rgb = mix(raw.rgb, face, twist * 0.38 * (1.0 - lod) * onBody);
-    rgb *= mix(1.0, mix(0.9, 1.12, grain), amt * onBody);
+    rgb = mix(raw.rgb, face, twist * 0.22 * (1.0 - lod) * onBody);
+    rgb *= mix(1.0, mix(0.96, 1.04, grain), amt * 0.4 * onBody);
 
     vec3 key = normalize(vec3(-0.42, 0.5, 0.76));
     vec3 fill = normalize(vec3(0.55, -0.15, 0.45));
     float ndl = clamp(dot(nCam, key), 0.0, 1.0);
     float fillL = clamp(dot(nCam, fill), 0.0, 1.0);
-    float wrap = clamp(ndl * 0.62 + 0.28 + fillL * 0.18, 0.0, 1.15);
+    float wrap = clamp(ndl * 0.28 + 0.72 + fillL * 0.08, 0.0, 1.08);
     float fres = pow(clamp(1.0 - nCam.z, 0.0, 1.0), 1.8);
-    vec3 lit = rgb * mix(0.48, 1.18, wrap);
-    lit += mix(uA, uC, 0.4) * fres * 0.32;
+    vec3 lit = rgb * mix(0.88, 1.06, wrap);
+    lit += mix(uA, uC, 0.4) * fres * 0.14;
     float specPow = mix(18.0, 42.0, isTide);
     float spec = pow(max(dot(nCam, normalize(key + vec3(0.0, 0.0, 1.0))), 0.0), specPow);
-    lit += uC * spec * mix(0.14, 0.38, isTide) * twist;
+    lit += uC * spec * mix(0.06, 0.18, isTide) * twist;
     rgb = mix(rgb, lit, onBody);
   }
 
@@ -265,7 +265,7 @@ void main() {
                (1.0 - smoothstep(source * 1.02, source * 1.12, pr));
   atmo *= (1.0 - isTide * 0.25);
   vec3 air = mix(uA, uC, 0.45);
-  float airA = atmo * mix(0.42, 0.22, lod);
+  float airA = atmo * mix(0.22, 0.1, lod);
   rgb = mix(rgb, air, atmo * 0.75);
   planetA = max(planetA, airA);
 
