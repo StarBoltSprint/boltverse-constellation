@@ -54,4 +54,11 @@ The prompt MUST say, every time:
 
 If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
 
-Last still is size-matched to the first still before the video call (same disc radius — Imagine cannot interpolate a zoom). Reject last stills that are close-ups. Recook the clip if radius spread > 12%. After Imagine: **lock globe**, then **RIFE 4×**. Recook max 2 if the body melts, grows, or becomes a second globe.
+Last still is size-matched to the first still before the video call (same disc radius — Imagine cannot interpolate a zoom). Reject last stills that are close-ups. Recook the clip if radius spread > 12%. After Imagine: **lock globe**, then **RIFE 4×**, then ping-pong. Recook max 2 if the body melts, grows, or becomes a second globe.
+
+Full method (impostor disc, lock_globe, RIFE, recook commands): [`METHOD.md`](METHOD.md).
+
+## Silhouette
+
+Planets are a **geometric disc**. Do not luma-key the interior (that eats the night side and breaks the circle). Star Core may keep a soft corona.
+
