@@ -29,8 +29,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.11,
-    halo: 0.2,
+    source: 0.28,
+    halo: 0.48,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.1,
@@ -236,10 +236,13 @@ void main() {
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  // Perfect circle. No luma key — that ate the dark limb and broke the silhouette.
+  // Perfect circle for the body. Bright bits in the halo (rings, shards) may stick out.
   float disc = 1.0 - smoothstep(source * 0.996, source * 1.004, pr);
+  float inHalo = 1.0 - smoothstep(halo * 0.90, halo, pr);
+  float lit = smoothstep(0.06, 0.14, luma);
+  float planetA = max(disc, (1.0 - disc) * lit * inHalo);
 
-  float a = mix(starA, disc, step(0.5, uKind)) * uOpacity;
+  float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
 }
 `;
