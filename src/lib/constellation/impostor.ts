@@ -29,10 +29,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.392,
-    halo: 0.48,
-    cx: 0.5,
-    cy: 0.5,
+    source: 0.255,
+    halo: 0.38,
+    cx: 0.48,
+    cy: 0.47,
     parallax: 0.07,
     kind: 1,
     a: [0.05, 0.22, 0.42],
@@ -43,8 +43,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   canyon: {
     source: 0.448,
     halo: 0.452,
-    cx: 0.513,
-    cy: 0.51,
+    cx: 0.524,
+    cy: 0.489,
     parallax: 0.08,
     kind: 2,
     a: [0.38, 0.14, 0.06],
@@ -262,7 +262,7 @@ void main() {
 
   float globe = 1.0 - smoothstep(source * 0.985, source * 1.002, pr);
   // Rings only where the plate is actually lit — never a black cookie.
-  float ring = smoothstep(0.28, 0.48, luma) * (1.0 - smoothstep(halo * 0.92, halo, pr));
+  float ring = smoothstep(0.34, 0.55, luma) * (1.0 - smoothstep(halo * 0.92, halo, pr));
   float planetA = mix(globe, max(globe, ring), isTide);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
@@ -404,7 +404,8 @@ export function createImpostorLayer(
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    if (frame.liveId && videos[frame.liveId]) {
+    if (videos.core) uploadVideo("core", videos.core);
+    if (frame.liveId && frame.liveId !== "core" && videos[frame.liveId]) {
       uploadVideo(frame.liveId, videos[frame.liveId]!);
     }
 

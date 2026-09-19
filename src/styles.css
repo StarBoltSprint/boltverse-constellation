@@ -132,18 +132,18 @@
 .tex-farm {
   position: fixed;
   left: 0;
-  top: 0;
-  width: 1px;
-  height: 1px;
+  bottom: 0;
+  width: 72px;
+  height: 72px;
   overflow: hidden;
-  opacity: 0.01;
+  opacity: 0.03;
   pointer-events: none;
   z-index: 0;
 }
 
 .tex-farm video {
-  width: 720px;
-  height: 720px;
+  width: 72px;
+  height: 72px;
   object-fit: cover;
 }
 

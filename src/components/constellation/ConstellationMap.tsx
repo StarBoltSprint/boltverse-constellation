@@ -199,7 +199,19 @@ export function ConstellationMap() {
     if (liveIdRef.current === id) return;
     const prev = liveIdRef.current;
     liveIdRef.current = id;
-    if (prev) {
+    const play = (vid: HTMLVideoElement | null) => {
+      if (!vid) return;
+      vid.muted = true;
+      vid.defaultMuted = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      vid.setAttribute("webkit-playsinline", "");
+      const p = vid.play();
+      if (p) void p.catch(() => {});
+    };
+    // Core keeps breathing even when you're on another world.
+    play(videoRefs.current.core);
+    if (prev && prev !== "core") {
       const old = videoRefs.current[prev];
       if (old) {
         old.classList.remove("is-live");
@@ -207,14 +219,9 @@ export function ConstellationMap() {
       }
     }
     if (!id || !playingRef.current) return;
+    if (id !== "core") play(videoRefs.current[id]);
     const v = videoRefs.current[id];
-    if (!v) return;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.playsInline = true;
-    v.classList.add("is-live");
-    const play = v.play();
-    if (play) void play.catch(() => {});
+    if (v) v.classList.add("is-live");
   }, []);
 
   const apply = useCallback(() => {
@@ -782,7 +789,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
-      data-rev="nohalo"
+      data-rev="fill2"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}
@@ -894,6 +901,7 @@ export function ConstellationMap() {
             muted
             loop
             playsInline
+            webkit-playsinline="true"
             preload={n.id === "core" ? "auto" : "metadata"}
             disablePictureInPicture
             controls={false}
