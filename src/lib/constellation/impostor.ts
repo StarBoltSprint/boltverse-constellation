@@ -29,11 +29,11 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.255,
-    halo: 0.39,
+    source: 0.242,
+    halo: 0.42,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.1,
+    parallax: 0.0,
     kind: 1,
     a: [0.05, 0.22, 0.42],
     b: [0.16, 0.48, 0.22],
@@ -42,10 +42,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   canyon: {
     source: 0.312,
-    halo: 0.34,
+    halo: 0.318,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.12,
+    parallax: 0.0,
     kind: 2,
     a: [0.38, 0.14, 0.06],
     b: [0.78, 0.38, 0.16],
@@ -229,19 +229,21 @@ void main() {
     face += uC * (spark - 0.5) * 0.05 * amt;
   }
 
-  // One sample only. Never stamp a second disc (inSrc mix = nested globe).
-  vec3 rgb = mix(raw.rgb, face, twist * 0.35 * (1.0 - lod));
-  rgb = mix(rgb, raw.rgb, lod * 0.85);
+  // Planets: the photo only. Face mix stamped a second globe on Canyon.
+  vec3 rgb = uKind < 0.5
+    ? mix(mix(raw.rgb, face, twist * 0.35 * (1.0 - lod)), raw.rgb, lod * 0.85)
+    : raw.rgb;
 
   float luma = max(rgb.r, max(rgb.g, rgb.b));
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  // Body is a disc. Void stays void. Rings/shards only if they are actually bright.
+  // Body disc. Canyon (kind>=2): disc only. Tide: disc + bright rings, never the void.
   float disc = 1.0 - smoothstep(source * 0.996, source * 1.004, pr);
   float inHalo = 1.0 - smoothstep(halo * 0.92, halo, pr);
-  float ring = smoothstep(0.24, 0.45, luma);
-  float planetA = max(disc, ring * inHalo);
+  float ring = smoothstep(0.32, 0.55, luma);
+  float isTide = step(0.5, uKind) * (1.0 - step(1.5, uKind));
+  float planetA = max(disc, ring * inHalo * isTide);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
