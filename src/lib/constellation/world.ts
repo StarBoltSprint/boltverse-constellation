@@ -36,8 +36,8 @@ export const NODES: WorldNode[] = [
     y: 480,
     z: 440,
     ring: "inner",
-    video: "/videos/tide.mp4?v=orig3",
-    poster: "/videos/tide.jpg?v=orig3",
+    video: "/videos/tide.mp4?v=nohalo",
+    poster: "/videos/tide.jpg?v=nohalo",
   },
   {
     id: "canyon",
@@ -47,8 +47,8 @@ export const NODES: WorldNode[] = [
     y: -400,
     z: -410,
     ring: "inner",
-    video: "/videos/canyon.mp4?v=orig3",
-    poster: "/videos/canyon.jpg?v=orig3",
+    video: "/videos/canyon.mp4?v=nohalo",
+    poster: "/videos/canyon.jpg?v=nohalo",
   },
   {
     id: "crystal",
@@ -58,8 +58,8 @@ export const NODES: WorldNode[] = [
     y: -1440,
     z: 290,
     ring: "inner",
-    video: "/videos/crystal.mp4?v=orig3",
-    poster: "/videos/crystal.jpg?v=orig3",
+    video: "/videos/crystal.mp4?v=nohalo",
+    poster: "/videos/crystal.jpg?v=nohalo",
   },
   {
     id: "hollow",

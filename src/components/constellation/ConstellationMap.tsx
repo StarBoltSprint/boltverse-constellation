@@ -782,7 +782,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
-      data-rev="orig3"
+      data-rev="nohalo"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}
@@ -870,7 +870,6 @@ export function ConstellationMap() {
                 spinRefs.current[n.id] = el;
               }}
             >
-            <div className="node-glow" />
             {!hasImpostor ? (
               <img
                 src={n.poster}

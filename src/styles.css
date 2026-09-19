@@ -151,8 +151,12 @@
   display: none !important;
 }
 
-.has-impostor .node-glow {
-  opacity: 0;
+.has-impostor .node-glow,
+.node-glow {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .has-impostor .node-orb {
@@ -279,39 +283,6 @@
   animation-delay: 360ms;
 }
 
-.node-glow {
-  position: absolute;
-  inset: 18%;
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgb(var(--node-glow) / 0.42) 0%,
-    rgb(var(--node-glow) / 0.12) 42%,
-    transparent 70%
-  );
-  filter: blur(18px);
-}
-
-[data-node="core"] {
-  --node-glow: 255 214 150;
-}
-[data-node="tide"] {
-  --node-glow: 120 198 214;
-}
-[data-node="canyon"] {
-  --node-glow: 210 140 88;
-}
-[data-node="crystal"] {
-  --node-glow: 186 214 230;
-}
-[data-node="hollow"] {
-  --node-glow: 140 150 170;
-}
-[data-node="drift"] {
-  --node-glow: 176 184 192;
-}
 
 .thread-glow {
   fill: none;
@@ -376,63 +347,3 @@
   }
 }
 
-
-.node-glow {
-  position: absolute;
-  inset: 18%;
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgb(var(--node-glow) / 0.42) 0%,
-    rgb(var(--node-glow) / 0.12) 42%,
-    transparent 70%
-  );
-  filter: blur(18px);
-}
-
-[data-node="core"] {
-  --node-glow: 255 214 150;
-}
-[data-node="tide"] {
-  --node-glow: 120 198 214;
-}
-[data-node="canyon"] {
-  --node-glow: 210 140 88;
-}
-[data-node="crystal"] {
-  --node-glow: 186 214 230;
-}
-[data-node="hollow"] {
-  --node-glow: 140 150 170;
-}
-[data-node="drift"] {
-  --node-glow: 176 184 192;
-}
-
-.thread {
-  fill: none;
-  stroke: color-mix(in oklab, var(--color-accent) 32%, transparent);
-  stroke-width: 1.15;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 3 14;
-  animation: thread-drift 14s linear infinite;
-}
-
-.thread-outer {
-  stroke: color-mix(in oklab, var(--color-accent) 18%, transparent);
-}
-
-@keyframes thread-drift {
-  to {
-    stroke-dashoffset: -34;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .thread {
-    animation: none;
-  }
-}

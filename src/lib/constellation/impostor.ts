@@ -30,7 +30,7 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   tide: {
     source: 0.392,
-    halo: 0.5,
+    halo: 0.48,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.07,
@@ -41,8 +41,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.442,
-    halo: 0.49,
+    source: 0.448,
+    halo: 0.452,
     cx: 0.513,
     cy: 0.51,
     parallax: 0.08,
@@ -53,8 +53,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 8.1,
   },
   crystal: {
-    source: 0.44,
-    halo: 0.49,
+    source: 0.422,
+    halo: 0.426,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.08,
@@ -196,6 +196,11 @@ void main() {
     gl_FragColor = vec4(0.0);
     return;
   }
+  // Hard limb for rock/ice/ash — never a second ring of plate.
+  if (uKind >= 1.5 && pr > source * 1.012) {
+    gl_FragColor = vec4(0.0);
+    return;
+  }
 
   vec4 raw = texture2D(uTex, vUv);
 
@@ -255,19 +260,10 @@ void main() {
   float window = 1.0 - smoothstep(halo * 0.88, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  float globe = 1.0 - smoothstep(source * 0.975, source * 1.008, pr);
-  float ring = smoothstep(0.14, 0.30, luma) * (1.0 - smoothstep(halo * 0.86, halo, pr));
+  float globe = 1.0 - smoothstep(source * 0.985, source * 1.002, pr);
+  // Rings only where the plate is actually lit — never a black cookie.
+  float ring = smoothstep(0.28, 0.48, luma) * (1.0 - smoothstep(halo * 0.92, halo, pr));
   float planetA = mix(globe, max(globe, ring), isTide);
-  planetA *= mix(1.0, max(globe, smoothstep(0.05, 0.12, luma)), isTide);
-
-  // Colored air, not a black cookie. Lives just outside the limb.
-  float atmo = smoothstep(source * 0.92, source * 1.01, pr) *
-               (1.0 - smoothstep(source * 1.02, source * 1.12, pr));
-  atmo *= (1.0 - isTide * 0.25);
-  vec3 air = mix(uA, uC, 0.45);
-  float airA = atmo * mix(0.22, 0.1, lod);
-  rgb = mix(rgb, air, atmo * 0.75);
-  planetA = max(planetA, airA);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
