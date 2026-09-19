@@ -286,6 +286,17 @@ function rifeSlow(src, dest, multi = 4) {
   encodeH264(raw, dest);
 }
 
+/** Lock disc radius + center so Imagine dolly cannot leak into the loop. */
+function lockGlobe(src, dest) {
+  const script = join(process.cwd(), "scripts/lock_globe.py");
+  const r = spawnSync("python3", [script, "--video", src, "--output", dest], {
+    encoding: "utf8",
+  });
+  if (r.status !== 0) {
+    throw new Error((r.stderr || r.stdout || "lock globe failed").slice(0, 600));
+  }
+}
+
 export async function cookWorld(id, videosDir) {
   const spec = WORLDS[id];
   if (!spec) throw new Error("unknown world " + id);
@@ -302,10 +313,13 @@ export async function cookWorld(id, videosDir) {
     }
     console.log("clip spin (first+last, no morph, no size change, slow axis)", id);
     await imaginePlanetClip({ first, last, dest, kind: "spin", paint: spec.paint, seconds: 10 });
+    const locked = join(kitchen, id + "-locked.mp4");
     const rife = join(kitchen, id + "-rife.mp4");
     const ping = join(kitchen, id + "-slow-ping.mp4");
+    console.log("lock globe size", id);
+    lockGlobe(dest, locked);
     console.log("RIFE 4x slow-mo", id);
-    rifeSlow(dest, rife, 4);
+    rifeSlow(locked, rife, 4);
     console.log("ping-pong", id);
     pingPong(rife, ping);
     return ping;

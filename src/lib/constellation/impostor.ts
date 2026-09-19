@@ -41,8 +41,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.19,
-    halo: 0.22,
+    source: 0.38,
+    halo: 0.46,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.12,
