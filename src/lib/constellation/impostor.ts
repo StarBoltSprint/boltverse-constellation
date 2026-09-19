@@ -29,8 +29,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.242,
-    halo: 0.42,
+    source: 0.248,
+    halo: 0.46,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.0,
@@ -127,6 +127,7 @@ uniform vec2 uCenter;
 uniform vec4 uParams;
 uniform float uOpacity;
 uniform float uKind;
+uniform float uTide;
 uniform float uSeed;
 uniform float uTime;
 uniform vec3 uA;
@@ -186,11 +187,27 @@ void main() {
   float halo0 = uParams.y;
   float para = uParams.z;
   float lod = uParams.w;
-  // Stars may bloom on zoom. Planets must not — that grew a black plate.
   float halo = uKind < 0.5 ? mix(halo0, 0.52, lod) : halo0;
 
   vec2 d = vUv - uCenter;
   float pr = length(d);
+
+  // Tide is hardcoded so a bad uniform can never paint the plate.
+  if (uTide > 0.5) {
+    if (pr > 0.48) {
+      gl_FragColor = vec4(0.0);
+      return;
+    }
+    vec4 plate = texture2D(uTex, vUv);
+    float L = max(plate.r, max(plate.g, plate.b));
+    float globe = 1.0 - smoothstep(0.246, 0.254, pr);
+    float ring = smoothstep(0.14, 0.28, L);
+    float ringWin = 1.0 - smoothstep(0.40, 0.47, pr);
+    float a = max(globe, ring * ringWin) * uOpacity;
+    gl_FragColor = vec4(plate.rgb * a, a);
+    return;
+  }
+
   if (pr > halo) {
     gl_FragColor = vec4(0.0);
     return;
@@ -238,12 +255,12 @@ void main() {
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  // Body disc. Canyon (kind>=2): disc only. Tide: disc + bright rings, never the void.
+  // Tide: globe (dark oceans stay). Rings if they are actually bright. Plate void dies.
   float disc = 1.0 - smoothstep(source * 0.996, source * 1.004, pr);
   float inHalo = 1.0 - smoothstep(halo * 0.92, halo, pr);
-  float ring = smoothstep(0.32, 0.55, luma);
+  float ring = smoothstep(0.32, 0.55, luma) * inHalo;
   float isTide = step(0.5, uKind) * (1.0 - step(1.5, uKind));
-  float planetA = max(disc, ring * inHalo * isTide);
+  float planetA = mix(disc, max(disc, ring), isTide);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
@@ -299,6 +316,7 @@ export function createImpostorLayer(
   const uParams = gl.getUniformLocation(prog, "uParams");
   const uOpacity = gl.getUniformLocation(prog, "uOpacity");
   const uKind = gl.getUniformLocation(prog, "uKind");
+  const uTide = gl.getUniformLocation(prog, "uTide");
   const uSeed = gl.getUniformLocation(prog, "uSeed");
   const uTime = gl.getUniformLocation(prog, "uTime");
   const uA = gl.getUniformLocation(prog, "uA");
@@ -413,6 +431,7 @@ export function createImpostorLayer(
       gl.uniform4f(uParams, cfg.source, cfg.halo, cfg.parallax, s.lod);
       gl.uniform1f(uOpacity, s.opacity);
       gl.uniform1f(uKind, cfg.kind);
+      gl.uniform1f(uTide, s.id === "tide" ? 1.0 : 0.0);
       gl.uniform1f(uSeed, cfg.seed);
       gl.uniform1f(uTime, tSec);
       gl.uniform3f(uA, cfg.a[0], cfg.a[1], cfg.a[2]);

@@ -782,6 +782,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
+      data-rev="noleak"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}
@@ -870,23 +871,34 @@ export function ConstellationMap() {
               }}
             >
             <div className="node-glow" />
-            <img src={n.poster} alt="" draggable={false} className="node-media" />
-            <video
-              ref={(el) => {
-                videoRefs.current[n.id] = el;
-              }}
-              src={n.video}
-              poster={n.poster}
-              muted
-              loop
-              playsInline
-              preload={n.id === "core" ? "auto" : "metadata"}
-              disablePictureInPicture
-              controls={false}
-              className="node-media node-video"
-            />
+            {!hasImpostor ? (
+              <img
+                src={n.poster}
+                alt=""
+                draggable={false}
+                className={`node-media plate-${n.id}`}
+              />
+            ) : null}
             </div>
           </div>
+        ))}
+      </div>
+
+      <div className="tex-farm" aria-hidden="true">
+        {NODES.map((n) => (
+          <video
+            key={n.id}
+            ref={(el) => {
+              videoRefs.current[n.id] = el;
+            }}
+            src={n.video}
+            muted
+            loop
+            playsInline
+            preload={n.id === "core" ? "auto" : "metadata"}
+            disablePictureInPicture
+            controls={false}
+          />
         ))}
       </div>
 

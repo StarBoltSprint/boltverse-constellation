@@ -130,24 +130,25 @@
 }
 
 .tex-farm {
-  position: absolute;
-  left: -64px;
-  top: -64px;
-  width: 8px;
-  height: 8px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  opacity: 0;
+  opacity: 0.01;
   pointer-events: none;
+  z-index: 0;
 }
 
 .tex-farm video {
-  width: 8px;
-  height: 8px;
+  width: 720px;
+  height: 720px;
+  object-fit: cover;
 }
 
 .has-impostor .node-media {
-  opacity: 0 !important;
-  visibility: hidden !important;
+  display: none !important;
 }
 
 .has-impostor .node-glow {
@@ -158,6 +159,7 @@
   clip-path: none;
   border-radius: 0;
   overflow: visible;
+  background: transparent;
 }
 
 .node-orb {
@@ -166,6 +168,7 @@
   pointer-events: none;
   border-radius: 0;
   clip-path: none;
+  background: transparent;
   transform-origin: 50% 50%;
 }
 
@@ -187,16 +190,39 @@
   object-fit: cover;
   display: block;
   pointer-events: none;
+  background: transparent;
 }
 
-.node-video {
-  z-index: 1;
-  opacity: 0 !important;
-  visibility: hidden;
+.plate-tide {
+  -webkit-mask-image: url("/videos/tide-mask.png?v=noleak");
+  mask-image: url("/videos/tide-mask.png?v=noleak");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
-.node-video.is-live {
-  opacity: 0 !important;
+.plate-canyon {
+  -webkit-mask-image: radial-gradient(circle, #fff 31.2%, transparent 31.8%);
+  mask-image: radial-gradient(circle, #fff 31.2%, transparent 31.8%);
+}
+
+.plate-core {
+  -webkit-mask-image: radial-gradient(circle, #fff 12%, transparent 14%);
+  mask-image: radial-gradient(circle, #fff 12%, transparent 14%);
+}
+
+.plate-crystal {
+  -webkit-mask-image: radial-gradient(circle, #fff 13%, transparent 15%);
+  mask-image: radial-gradient(circle, #fff 13%, transparent 15%);
+}
+
+.plate-hollow {
+  -webkit-mask-image: radial-gradient(circle, #fff 17%, transparent 19%);
+  mask-image: radial-gradient(circle, #fff 17%, transparent 19%);
+}
+
+.plate-drift {
+  -webkit-mask-image: radial-gradient(circle, #fff 9%, transparent 11%);
+  mask-image: radial-gradient(circle, #fff 9%, transparent 11%);
 }
 
 .world-layer {
