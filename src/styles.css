@@ -131,6 +131,7 @@
 
 .has-impostor .node-media {
   opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 .has-impostor .node-glow {
@@ -333,77 +334,6 @@
   }
 }
 
-
-.impostor-layer {
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-}
-
-.has-impostor .node-media {
-  opacity: 0 !important;
-}
-
-.has-impostor .node-glow {
-  opacity: 0;
-}
-
-.has-impostor .node-orb {
-  clip-path: none;
-  border-radius: 0;
-  overflow: visible;
-}
-
-.node-orb {
-  position: absolute;
-  overflow: hidden;
-  pointer-events: none;
-  border-radius: 50%;
-  clip-path: circle(31% at 50% 50%);
-  transform-origin: 50% 50%;
-  transition: clip-path 0.5s var(--ease-out);
-}
-
-.node-orb.is-immersed {
-  clip-path: circle(58% at 50% 50%);
-}
-
-.node-spin {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 50%;
-}
-
-.node-media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
-}
-
-.node-video {
-  z-index: 1;
-  opacity: 0;
-}
-
-.node-video.is-live {
-  opacity: 1;
-}
-
-.world-layer {
-  z-index: 1;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-.hud-layer,
-.gate-layer {
-  z-index: 40;
-  transform: translateZ(0);
-}
 
 .node-glow {
   position: absolute;

@@ -41,8 +41,8 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.372,
-    halo: 0.4,
+    source: 0.312,
+    halo: 0.34,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.12,
@@ -210,7 +210,7 @@ void main() {
   vec2 tilt = vec2(sin(yaw), sin(pit)) * para;
   vec2 samp = d + tilt * z * source;
   float sampR = length(samp);
-  float maxR = source * 0.97;
+  float maxR = source * 0.92;
   if (sampR > maxR) samp *= maxR / max(sampR, 0.0001);
   vec3 face = texture2D(uTex, uCenter + samp).rgb;
   face = mix(raw.rgb, face, twist);
