@@ -51,4 +51,4 @@ The prompt MUST say, every time:
 
 If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
 
-Ping-pong the spin clip (and slow 5×) so the loop does not snap and the turn reads as a real world, not a toupie. Recook max 2 if the body melts, grows, or becomes a second globe.
+Ping-pong the spin clip so the loop does not snap. Slow-mo is **RIFE 4×** (optical-flow frames, same 24 fps — a real turn, not freeze-frames). Recook max 2 if the body melts, grows, or becomes a second globe.

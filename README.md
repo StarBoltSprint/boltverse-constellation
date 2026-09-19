@@ -36,7 +36,7 @@ node scripts/imagine-planet-hooks.mjs canyon
 node scripts/imagine-planet-hooks.mjs          # all six
 ```
 
-Spin worlds get a distinct last still (~20° yaw of the **same** body), then `image` + `last_frame` video, then 5× slow + ping-pong. Core is breath (first = last). Kitchen leftovers stay in `public/videos/_spin/` (gitignored).
+Spin worlds get a distinct last still (~20° yaw of the **same** body), then `image` + `last_frame` video, then **RIFE 4×** slow-mo + ping-pong. Core is breath (first = last). Kitchen leftovers stay in `public/videos/_spin/` (gitignored).
 
 ## Repo
 

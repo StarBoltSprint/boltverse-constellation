@@ -222,33 +222,11 @@ function posterFromClip(clip, dest) {
   ffmpeg(["-y", "-i", clip, "-ss", "0.12", "-frames:v", "1", dest]);
 }
 
-function slowPingPong(src, dest, factor = 5) {
-  const slow = dest.replace(/\.mp4$/, "-slow.mp4");
+function pingPong(src, dest) {
   ffmpeg([
     "-y",
     "-i",
     src,
-    "-filter:v",
-    `setpts=${factor}*PTS`,
-    "-r",
-    "24",
-    "-c:v",
-    "libx264",
-    "-preset",
-    "fast",
-    "-crf",
-    "20",
-    "-pix_fmt",
-    "yuv420p",
-    "-an",
-    "-movflags",
-    "+faststart",
-    slow,
-  ]);
-  ffmpeg([
-    "-y",
-    "-i",
-    slow,
     "-filter_complex",
     "[0:v]split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0,fps=24,format=yuv420p[v]",
     "-map",
@@ -268,6 +246,46 @@ function slowPingPong(src, dest, factor = 5) {
   ]);
 }
 
+function encodeH264(src, dest) {
+  ffmpeg([
+    "-y",
+    "-i",
+    src,
+    "-an",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "fast",
+    "-crf",
+    "20",
+    "-pix_fmt",
+    "yuv420p",
+    "-movflags",
+    "+faststart",
+    dest,
+  ]);
+}
+
+/** RIFE 4× — keep fps, insert optical-flow frames (a turn, not freeze-frames). */
+function rifeSlow(src, dest, multi = 4) {
+  const script = join(process.cwd(), "scripts/rife_slow.py");
+  const rifeRoot = process.env.RIFE_ROOT || "/tmp/Practical-RIFE";
+  const model = join(rifeRoot, "train_log/flownet.pkl");
+  if (!existsSync(script) || !existsSync(model)) {
+    throw new Error("RIFE not installed (need scripts/rife_slow.py + " + model + ")");
+  }
+  const raw = dest.replace(/\.mp4$/, "-rife-raw.mp4");
+  const r = spawnSync(
+    "python3",
+    [script, "--video", src, "--output", raw, "--multi", String(multi), "--fps", "24"],
+    { encoding: "utf8", env: { ...process.env, RIFE_ROOT: rifeRoot } },
+  );
+  if (r.status !== 0) {
+    throw new Error((r.stderr || r.stdout || "rife failed").slice(0, 600));
+  }
+  encodeH264(raw, dest);
+}
+
 export async function cookWorld(id, videosDir) {
   const spec = WORLDS[id];
   if (!spec) throw new Error("unknown world " + id);
@@ -284,9 +302,12 @@ export async function cookWorld(id, videosDir) {
     }
     console.log("clip spin (first+last, no morph, no size change, slow axis)", id);
     await imaginePlanetClip({ first, last, dest, kind: "spin", paint: spec.paint, seconds: 10 });
+    const rife = join(kitchen, id + "-rife.mp4");
     const ping = join(kitchen, id + "-slow-ping.mp4");
-    console.log("slow 5x + ping-pong", id);
-    slowPingPong(dest, ping, 5);
+    console.log("RIFE 4x slow-mo", id);
+    rifeSlow(dest, rife, 4);
+    console.log("ping-pong", id);
+    pingPong(rife, ping);
     return ping;
   }
   console.log("clip breath (first=last, no morph, no size change)", id);
