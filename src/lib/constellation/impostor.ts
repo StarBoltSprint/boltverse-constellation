@@ -41,10 +41,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 4.7,
   },
   canyon: {
-    source: 0.388,
-    halo: 0.42,
-    cx: 0.504,
-    cy: 0.495,
+    source: 0.372,
+    halo: 0.4,
+    cx: 0.5,
+    cy: 0.5,
     parallax: 0.12,
     kind: 2,
     a: [0.38, 0.14, 0.06],
@@ -236,14 +236,10 @@ void main() {
   float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  // Hard disc. Interior (including night) stays opaque.
-  // Only the rim may drop near-black plate / baked halo — never the terminator.
-  float disc = 1.0 - smoothstep(source * 0.982, source * 1.002, pr);
-  float rim = smoothstep(source * 0.90, source, pr);
-  float ink = 1.0 - smoothstep(0.04, 0.12, luma);
-  float planetA = disc * (1.0 - rim * ink * ink);
+  // Perfect circle. No luma key — that ate the dark limb and broke the silhouette.
+  float disc = 1.0 - smoothstep(source * 0.996, source * 1.004, pr);
 
-  float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
+  float a = mix(starA, disc, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
 }
 `;
