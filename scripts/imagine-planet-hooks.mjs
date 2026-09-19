@@ -52,7 +52,7 @@ const WORLDS = {
   core: {
     kind: "breath",
     paint:
-      "Golden star photosphere. Completely stationary in place. Corona and plasma may pulse and breathe. Size of the star body never changes. NO morph into another shape. NO rotation. Locked tripod. Never a second star.",
+      "Golden star photosphere with PERSISTENT coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame. The filaments may shimmer and wave but they NEVER retract, NEVER vanish, NEVER leave a smooth bowling-ball sun. Completely stationary in place. Corona breathes in brightness only. Size of the photosphere never changes — same pixel radius first to last. NO morph into another shape. NO rotation. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame, black void around them.",
   },
 };
 
@@ -163,12 +163,13 @@ function spinLine(paint) {
 function breathLine(paint) {
   return [
     "Seamless loop. First frame and last frame are the same still (already pinned).",
-    "The body remains COMPLETELY STATIONARY in place. NEVER walking. NEVER shifting. NEVER rotating.",
-    "Gentle living motion only: pulse, shimmer, corona breath. NO morph of form.",
-    "NO change of size. Same pixel radius the whole time.",
-    "Camera lock-off. Same center. No zoom. No dolly.",
+    "The photosphere remains COMPLETELY STATIONARY in place. NEVER walking. NEVER shifting. NEVER rotating. NEVER zooming.",
+    "NO change of size. Same pixel radius of the photosphere the whole time. Never small then large.",
+    "Coronal filaments (prominences, plasma loops, brins de lumière) stay around the ENTIRE limb in EVERY frame. They may shimmer and wave in place. They NEVER disappear. They NEVER retract into a smooth round ball.",
+    "Gentle living motion only: pulse of brightness, filament shimmer. NO morph of form. NO silhouette scale change.",
+    "Camera lock-off. Same center. No zoom. No dolly. No push-in. No pull-out.",
     paint,
-    "ONE body only.",
+    "ONE body only. Filaments stay. Size never changes.",
   ].join(" ");
 }
 
@@ -296,9 +297,9 @@ function rifeSlow(src, dest, multi = 4) {
 }
 
 /** Lock disc radius + center so Imagine dolly cannot leak into the loop. */
-function lockGlobe(src, dest) {
+function lockGlobe(src, dest, extra = []) {
   const script = join(process.cwd(), "scripts/lock_globe.py");
-  const r = spawnSync("python3", [script, "--video", src, "--output", dest], {
+  const r = spawnSync("python3", [script, "--video", src, "--output", dest, ...extra], {
     encoding: "utf8",
   });
   if (r.status !== 0) {
@@ -401,16 +402,31 @@ export async function cookWorld(id, videosDir, { force = false } = {}) {
     pingPong(rife, ping);
     return ping;
   }
-  console.log("clip breath (first=last, no morph, no size change)", id);
-  await imaginePlanetClip({
-    first,
-    last: first,
-    dest,
-    kind: "breath",
-    paint: spec.paint,
-    seconds: 6,
-  });
-  return dest;
+  console.log("clip breath (first=last, filaments stay, no morph, no size change)", id);
+  const locked = join(kitchen, id + "-locked.mp4");
+  const rife = join(kitchen, id + "-rife.mp4");
+  const ping = join(kitchen, id + "-slow-ping.mp4");
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await imaginePlanetClip({
+      first,
+      last: first,
+      dest,
+      kind: "breath",
+      paint: spec.paint,
+      seconds: 6,
+    });
+    const spread = clipSpread(dest);
+    console.log("clip radius spread", spread.toFixed(3), id);
+    if (spread < 0.12) break;
+    console.log("clip zoomed — recook", id);
+  }
+  console.log("lock photosphere, keep corona", id);
+  lockGlobe(dest, locked, ["--star"]);
+  console.log("RIFE 4x slow-mo", id);
+  rifeSlow(locked, rife, 4);
+  console.log("ping-pong", id);
+  pingPong(rife, ping);
+  return ping;
 }
 
 const force = process.argv.includes("--force");

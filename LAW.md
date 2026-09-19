@@ -50,7 +50,7 @@ The prompt MUST say, every time:
 | Kind | First | Last | Motion |
 |------|-------|------|--------|
 | **spin** (Tide, Canyon, Crystal, Hollow, Drift) | world still | **distinct** still of the **same** body, small yaw (~15°) | rigid slow axial turn. **NO morph. NO size change. NO camera move. ONE body.** |
-| **breath** (Star Core) | core still | **same** still | pulse / corona. Body stays put. **NO morph. NO size change. NO rotation.** |
+| **breath** (Star Core) | core still | **same** still | pulse / filament shimmer. Photosphere stays put. **Filaments stay in every frame. NO morph. NO size change. NO rotation.** |
 
 If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
 

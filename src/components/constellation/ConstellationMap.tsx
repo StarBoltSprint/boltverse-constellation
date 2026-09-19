@@ -782,7 +782,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
-      data-rev="sphere3"
+      data-rev="core2"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}

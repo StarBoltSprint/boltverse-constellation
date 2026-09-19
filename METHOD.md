@@ -63,7 +63,7 @@ node scripts/imagine-planet-hooks.mjs           # all six
 | Kind | Worlds | First | Last | Motion |
 |------|--------|-------|------|--------|
 | **spin** | Tide, Canyon, Crystal, Hollow, Drift | globe still | **distinct** still, small yaw | slow axis turn |
-| **breath** | Star Core | core still | **same** still | corona pulse, no rotation |
+| **breath** | Star Core | core still | **same** still | corona pulse, **filaments stay**, photosphere never changes size. Then `lock_globe --star` (keep corona) → RIFE 4× → ping-pong. |
 
 If first = last on a planet, Imagine holds still. Spin **must** be two different stills of the **same** globe.
 
