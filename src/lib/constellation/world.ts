@@ -47,8 +47,8 @@ export const NODES: WorldNode[] = [
     y: -400,
     z: -410,
     ring: "inner",
-    video: "/videos/canyon.mp4?v=lock",
-    poster: "/videos/canyon.jpg?v=lock",
+    video: "/videos/canyon.mp4?v=camlock",
+    poster: "/videos/canyon.jpg?v=camlock",
   },
   {
     id: "crystal",

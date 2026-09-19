@@ -40,15 +40,18 @@ Never chat Imagine without `last_frame`. Never `image_to_video` on one still for
 
 The prompt MUST say, every time:
 
+- **CAMERA LOCKED** — tripod bolted. Never pans, tilts, zooms, dollies, pushes in, pulls out, or flys over the surface. Framing never changes.
+- **FULL disc always visible** — black void around the limb. Never a close-up. Never terrain filling the frame.
 - **NO morph**
 - **NO change of size** (same pixel radius, first to last)
+- **ONE body only** — never a second globe, never a nested planet, never a moon
 - **ONLY a SLOW rotation** of the same body on its own axis (low yaw)
 
 | Kind | First | Last | Motion |
 |------|-------|------|--------|
-| **spin** (Tide, Canyon, Crystal, Hollow, Drift) | world still | **distinct** still of the **same** body, small yaw (~20°) | rigid slow axial turn. **NO morph. NO size change.** |
+| **spin** (Tide, Canyon, Crystal, Hollow, Drift) | world still | **distinct** still of the **same** body, small yaw (~15°) | rigid slow axial turn. **NO morph. NO size change. NO camera move. ONE body.** |
 | **breath** (Star Core) | core still | **same** still | pulse / corona. Body stays put. **NO morph. NO size change. NO rotation.** |
 
 If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
 
-Ping-pong the spin clip so the loop does not snap. After Imagine: **lock globe** (constant disc radius + center — kills dolly/size morph), then **RIFE 4×** (optical-flow frames, same 24 fps). Recook max 2 if the body melts, grows, or becomes a second globe.
+Last still is size-matched to the first still before the video call (same disc radius — Imagine cannot interpolate a zoom). Reject last stills that are close-ups. Recook the clip if radius spread > 12%. After Imagine: **lock globe**, then **RIFE 4×**. Recook max 2 if the body melts, grows, or becomes a second globe.

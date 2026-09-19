@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Constellation KEEP — Odyssey Law 0 (read-only): Imagine films = image + last_frame.
 // ALWAYS pass first frame AND last frame. Copied API plumbing only. Does not touch boltverse-odyssey.
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, unlinkSync } from "node:fs";
 import { dirname, extname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -9,12 +9,14 @@ const BASE = process.env.IMAGINE_BASE || "https://api.x.ai/v1";
 const IMAGE_MODEL = process.env.IMAGINE_IMAGE_MODEL || "grok-imagine-image-2.0";
 const VIDEO_MODEL = process.env.IMAGINE_VIDEO_MODEL || "grok-imagine-video-1.5";
 
-/** Law 0 — every film, every time. */
+/** Law 0 — every film, every time. Camera never moves. One body. No morph. */
 const LAW = [
   "Photoreal square 1:1 plate, black void, ONE celestial body centered.",
-  "Camera COMPLETELY LOCKED — never pan, tilt, zoom, or dolly.",
-  "NO morph. NO melting. NO new continents. NO second body. NO text. NO UI.",
-  "NO change of size. The body keeps the exact same pixel radius from first frame to last frame.",
+  "CAMERA IS A LOCKED TRIPOD bolted to the floor. It never pans, never tilts, never zooms, never dollies, never pushes in, never pulls out, never flys over the surface, never changes focal length.",
+  "The FULL disc is always visible. Black void remains around the limb in every frame. NEVER a close-up. NEVER terrain filling the frame. NEVER a surface flyover.",
+  "Apparent diameter of the body is IDENTICAL in every frame — same pixel radius, same silhouette scale, same distance, same framing.",
+  "ONE body only. NEVER a second globe. NEVER a nested planet. NEVER a moon. NEVER a bulge that becomes a ball sitting on the surface.",
+  "NO morph. NO melting. NO new continents. NO text. NO UI.",
   "ONLY a SLOW rotation of the SAME body on its own vertical axis. Low yaw. Not a fast spin.",
   "Silent plate.",
 ].join(" ");
@@ -25,32 +27,32 @@ const WORLDS = {
   tide: {
     kind: "spin",
     paint:
-      "Blue ocean world with a thin bright ring. The globe rotates slowly on its vertical axis inside the ring. The ring stays in the same plane and does not tumble. Water stays water. Clouds drift with the rotation only. Same size the whole time.",
+      "Blue ocean world with a thin bright ring. ONE globe. The globe rotates slowly on its vertical axis inside the ring. The ring stays in the same plane and does not tumble. Water stays water. Clouds drift with the rotation only. Never a second globe. Full disc in frame, black void around the limb. Locked tripod. Same size the whole time.",
   },
   canyon: {
     kind: "spin",
     paint:
-      "Rust-red scarred desert globe. The same canyons and highlands rotate slowly into view. Surface markings travel across the limb. No new mountains. Same size the whole time.",
+      "Rust-red scarred desert globe. ONE globe only. The same canyons and highlands stay canyons — they travel around the sphere as surface texture. They NEVER round into a second sphere. NEVER become a moon. NEVER nest a smaller planet on the surface. Full disc always in frame with black void around the limb. Locked tripod: no zoom, no dolly, no push-in, no pull-out. Same pixel radius the whole time.",
   },
   crystal: {
     kind: "spin",
     paint:
-      "The same ice-crystal body, rigid. Existing shards stay attached. The whole cluster rotates slowly as one solid around the vertical axis. Never becomes a smooth planet. Never grows new spikes. Never melts. Same size the whole time.",
+      "The same ice-crystal body, rigid. Existing shards stay attached. The whole cluster rotates slowly as one solid around the vertical axis. Never becomes a smooth planet. Never grows new spikes. Never melts. Never a second globe. Full disc in frame. Locked tripod. Same size the whole time.",
   },
   hollow: {
     kind: "spin",
     paint:
-      "Dark grey cratered moon. The same craters rotate slowly into view. No new impact features. No atmosphere bloom. Same size the whole time.",
+      "Dark grey cratered moon. ONE globe. The same craters rotate slowly into view. No new impact features. No atmosphere bloom. Never a second globe. Full disc in frame. Locked tripod. Same size the whole time.",
   },
   drift: {
     kind: "spin",
     paint:
-      "Ash-grey dusty globe. The same pale surface rotates slowly. Fine dust may catch light. No morph. No new oceans. Same size the whole time.",
+      "Ash-grey dusty globe. ONE globe. The same pale surface rotates slowly. Fine dust may catch light. No morph. No new oceans. Never a second globe. Full disc in frame. Locked tripod. Same size the whole time.",
   },
   core: {
     kind: "breath",
     paint:
-      "Golden star photosphere. Completely stationary in place. Corona and plasma may pulse and breathe. Size of the star body never changes. NO morph into another shape. NO rotation.",
+      "Golden star photosphere. Completely stationary in place. Corona and plasma may pulse and breathe. Size of the star body never changes. NO morph into another shape. NO rotation. Locked tripod. Never a second star.",
   },
 };
 
@@ -145,13 +147,16 @@ async function pollVideo(id) {
 function spinLine(paint) {
   return [
     "First frame and last frame are already pinned by the API — do not redraw them.",
-    "ONLY a SLOW rotation of the SAME body on its own vertical axis, from the first still to the last still.",
-    "Low yaw. A gentle turn. Not a fast spin. Not a morph. Not a zoom.",
+    "The two stills are the SAME body at the SAME size. Interpolate ONLY a slow axial yaw between them.",
+    "CAMERA LOCKED ON A TRIPOD. Framing never changes. No zoom. No dolly. No push-in. No pull-out. No flyover. No focal-length change.",
+    "The full disc stays in frame. Black void around the limb in every frame. Never a close-up of the surface.",
+    "Low yaw. A gentle turn. Not a fast spin. Not a morph.",
     "NO morph. NO change of size. NO silhouette scale change. Same pixel radius the whole time.",
+    "ONE body only. NEVER a second globe. NEVER a nested planet. NEVER a moon. Canyons stay canyons — they do not round into another world.",
     "Features that exist only travel around the sphere. Nothing new appears. Nothing melts.",
-    "Camera lock-off. Same center. Black void stays black.",
+    "Same center. Black void stays black.",
     paint,
-    "NO morph. NO size change. ONE body only. Never a second globe.",
+    "NO morph. NO size change. NO camera move. ONE body only. Never a second globe. Camera never moves.",
   ].join(" ");
 }
 
@@ -161,7 +166,7 @@ function breathLine(paint) {
     "The body remains COMPLETELY STATIONARY in place. NEVER walking. NEVER shifting. NEVER rotating.",
     "Gentle living motion only: pulse, shimmer, corona breath. NO morph of form.",
     "NO change of size. Same pixel radius the whole time.",
-    "Camera lock-off. Same center.",
+    "Camera lock-off. Same center. No zoom. No dolly.",
     paint,
     "ONE body only.",
   ].join(" ");
@@ -170,8 +175,12 @@ function breathLine(paint) {
 export async function imagineLastStill({ first, dest, paint }) {
   const prompt = [
     LAW,
-    "Edit: rotate the SAME body a SMALL amount (~20 degrees) around the vertical axis.",
-    "Last pose of a SLOW spin. Same size. Same pixel radius. Same lighting family. Same void.",
+    "Edit: rotate the SAME body a SMALL amount (~15 degrees) around the vertical axis.",
+    "Last pose of a SLOW spin. Keep the FULL globe in frame.",
+    "IDENTICAL size and pixel radius as the first still. Same distance. Same framing. Same focal length.",
+    "Do NOT zoom in. Do NOT zoom out. Do NOT pull the camera back. Do NOT crop into the surface. Do NOT fill the frame with terrain.",
+    "The limb and the black void around it must remain visible, same as the first still.",
+    "ONE globe only. No second body. No nested planet. No moon.",
     "NO morph. NO change of size. Do not invent a new planet. Do not change the silhouette scale.",
     paint,
   ].join(" ");
@@ -297,7 +306,53 @@ function lockGlobe(src, dest) {
   }
 }
 
-export async function cookWorld(id, videosDir) {
+/** Make last still the same apparent diameter as first before Imagine video. */
+function matchDisc(src, ref, dest) {
+  const script = join(process.cwd(), "scripts/lock_globe.py");
+  const r = spawnSync(
+    "python3",
+    [script, "--still", src, "--match-to", ref, "--output", dest],
+    { encoding: "utf8" },
+  );
+  if (r.status !== 0) {
+    throw new Error((r.stderr || r.stdout || "match disc failed").slice(0, 600));
+  }
+}
+
+function discRadius(path) {
+  const r = spawnSync("python3", [join(process.cwd(), "scripts/lock_globe.py"), "--disc", path], {
+    encoding: "utf8",
+  });
+  if (r.status !== 0) throw new Error((r.stderr || r.stdout || "disc failed").slice(0, 300));
+  return parseFloat(r.stdout.trim().split(/\s+/)[0]);
+}
+
+function clipSpread(path) {
+  const r = spawnSync(
+    "python3",
+    [join(process.cwd(), "scripts/lock_globe.py"), "--measure", "--video", path, "--output", "-"],
+    { encoding: "utf8" },
+  );
+  if (r.status !== 0) throw new Error((r.stderr || r.stdout || "measure failed").slice(0, 300));
+  const line = r.stdout.trim().split("\n").pop() || "";
+  const m = line.match(/min ([0-9.]+)\s+max ([0-9.]+)\s+median ([0-9.]+)/);
+  if (!m) return 1;
+  const min = parseFloat(m[1]);
+  const max = parseFloat(m[2]);
+  const med = parseFloat(m[3]) || 1;
+  return (max - min) / med;
+}
+
+function lastDiscOk(firstPath, lastPath) {
+  const r0 = discRadius(firstPath);
+  const r1 = discRadius(lastPath);
+  const rel = Math.abs(r1 - r0) / r0;
+  const ok = rel < 0.08 && r1 > 0.22 && r1 < 0.46;
+  console.log(`disc first=${r0.toFixed(3)} last=${r1.toFixed(3)} rel=${rel.toFixed(3)} ${ok ? "ok" : "REJECT"}`);
+  return ok;
+}
+
+export async function cookWorld(id, videosDir, { force = false } = {}) {
   const spec = WORLDS[id];
   if (!spec) throw new Error("unknown world " + id);
   const first = join(videosDir, id + ".jpg");
@@ -307,12 +362,34 @@ export async function cookWorld(id, videosDir) {
   const last = join(kitchen, id + "-last.jpg");
   const dest = join(kitchen, id + ".mp4");
   if (spec.kind === "spin") {
+    if (force && existsSync(last)) unlinkSync(last);
     if (!existsSync(last)) {
       console.log("still last", id);
       await imagineLastStill({ first, dest: last, paint: spec.paint });
     }
-    console.log("clip spin (first+last, no morph, no size change, slow axis)", id);
-    await imaginePlanetClip({ first, last, dest, kind: "spin", paint: spec.paint, seconds: 10 });
+    const lastMatched = join(kitchen, id + "-last-matched.jpg");
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (lastDiscOk(first, last)) break;
+      console.log("last still rejected — regenerate", id, "attempt", attempt + 1);
+      await imagineLastStill({ first, dest: last, paint: spec.paint });
+    }
+    console.log("match last disc to first", id);
+    matchDisc(last, first, lastMatched);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      console.log("clip spin (first+last, camera lock, no morph, no size change, one body)", id, "try", attempt + 1);
+      await imaginePlanetClip({
+        first,
+        last: lastMatched,
+        dest,
+        kind: "spin",
+        paint: spec.paint,
+        seconds: 10,
+      });
+      const spread = clipSpread(dest);
+      console.log("clip radius spread", spread.toFixed(3), id);
+      if (spread < 0.12) break;
+      console.log("clip zoomed — recook", id);
+    }
     const locked = join(kitchen, id + "-locked.mp4");
     const rife = join(kitchen, id + "-rife.mp4");
     const ping = join(kitchen, id + "-slow-ping.mp4");
@@ -336,18 +413,23 @@ export async function cookWorld(id, videosDir) {
   return dest;
 }
 
+const force = process.argv.includes("--force");
 const ids = process.argv.slice(2).filter((a) => !a.startsWith("-"));
 const isCli = process.argv[1] && process.argv[1].includes("imagine-planet-hooks");
 if (isCli) {
   const videosDir = join(process.cwd(), "public/videos");
   const queue = ids.length ? ids : Object.keys(WORLDS);
   for (const id of queue) {
-    const out = await cookWorld(id, videosDir);
+    const out = await cookWorld(id, videosDir, { force });
     const live = join(videosDir, id + ".mp4");
     const bak = join(videosDir, "_spin", id + ".prev.mp4");
     if (existsSync(live)) copyFileSync(live, bak);
     copyFileSync(out, live);
-    posterFromClip(live, join(videosDir, id + ".jpg"));
+    // Keep the Law 0 first still. Never replace it with a video frame
+    // (a mid-clip close-up would poison the next cook).
+    if (!existsSync(join(videosDir, id + ".jpg"))) {
+      posterFromClip(live, join(videosDir, id + ".jpg"));
+    }
     console.log("hung", id, live);
   }
 }

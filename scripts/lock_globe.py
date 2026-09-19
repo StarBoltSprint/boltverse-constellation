@@ -142,14 +142,40 @@ def lock_video(src, dest, target_uv=None):
     return target_r / w
 
 
+def match_to_ref(src, ref, dest):
+    """Scale src's disc to ref's disc radius, centered. For last_frame vs first."""
+    ref_im = cv2.imread(ref)
+    src_im = cv2.imread(src)
+    if ref_im is None or src_im is None:
+        raise SystemExit("match missing " + src + " or " + ref)
+    _, _, r_ref = largest_disc(ref_im)
+    h, w = src_im.shape[:2]
+    out = lock_frame(src_im, r_ref, w * 0.5, h * 0.5)
+    os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
+    cv2.imwrite(dest, out)
+    print(f"match disc {src} → r={r_ref/w:.3f}  {dest}", flush=True)
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--video", required=True)
-    p.add_argument("--output", required=True)
+    p.add_argument("--video", default=None)
+    p.add_argument("--output", required=False, default="-")
     p.add_argument("--radius", type=float, default=None, help="target UV radius")
     p.add_argument("--measure", action="store_true")
+    p.add_argument("--disc", default=None, help="print UV radius of a still")
+    p.add_argument("--match-to", default=None, help="still whose disc size we copy")
+    p.add_argument("--still", default=None, help="source still to resize")
     args = p.parse_args()
-    if args.measure:
+    if args.disc:
+        im = cv2.imread(args.disc)
+        if im is None:
+            raise SystemExit("cannot read " + args.disc)
+        cx, cy, r = largest_disc(im)
+        h, w = im.shape[:2]
+        print(f"{r/w:.4f} {cx/w:.4f} {cy/h:.4f}")
+    elif args.match_to and args.still:
+        match_to_ref(args.still, args.match_to, args.output)
+    elif args.measure:
         rows = measure_clip(args.video)
         print(f"{'r':>6} {'cx':>6} {'cy':>6}")
         for r, cx, cy in rows:

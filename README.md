@@ -28,7 +28,7 @@ App listens on port 8080. Pinch · twist · drag. **Core** flies to the star. **
 
 Cinematic plates live in `public/videos/` (`core`, `tide`, `canyon`, `crystal`, `hollow`, `drift` + posters). They are the albedo of each world — radial orbs / sphere impostors, never a tiled collage.
 
-**Always** cook with first frame **and** last frame. Prompt is locked to: **no morph, no size change, only a slow rotation on its own axis.**
+**Always** cook with first frame **and** last frame. Prompt is locked to: **camera never moves, no morph, no size change, one body only, only a slow rotation on its own axis.**
 
 ```bash
 # needs XAI_API_KEY
