@@ -65,16 +65,18 @@
 
 .nebula-far {
   background:
-    radial-gradient(ellipse 58% 42% at 50% 48%, rgb(255 214 150 / 0.1), transparent 58%),
-    radial-gradient(ellipse 78% 52% at 24% 18%, rgb(42 54 96 / 0.38), transparent 66%),
-    radial-gradient(ellipse 64% 48% at 82% 78%, rgb(26 34 62 / 0.32), transparent 70%);
+    radial-gradient(ellipse 70% 48% at 50% 46%, rgb(255 214 150 / 0.07), transparent 62%),
+    radial-gradient(ellipse 90% 70% at 12% 8%, rgb(38 48 96 / 0.42), transparent 70%),
+    radial-gradient(ellipse 72% 58% at 88% 86%, rgb(58 28 48 / 0.28), transparent 72%),
+    radial-gradient(ellipse 50% 40% at 70% 18%, rgb(24 58 72 / 0.22), transparent 68%);
 }
 
 .nebula-near {
   background:
-    radial-gradient(ellipse 50% 38% at 76% 74%, rgb(72 44 28 / 0.2), transparent 64%),
-    radial-gradient(ellipse 38% 30% at 16% 68%, rgb(36 64 78 / 0.14), transparent 66%);
-  animation: nebula-breathe 22s ease-in-out infinite;
+    radial-gradient(ellipse 46% 36% at 78% 72%, rgb(86 48 32 / 0.18), transparent 66%),
+    radial-gradient(ellipse 40% 32% at 14% 64%, rgb(32 72 88 / 0.16), transparent 68%),
+    radial-gradient(ellipse 28% 22% at 42% 12%, rgb(64 56 96 / 0.1), transparent 70%);
+  animation: nebula-breathe 26s ease-in-out infinite;
 }
 
 .sky-tint {

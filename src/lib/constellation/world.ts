@@ -46,9 +46,9 @@ export const NODES: WorldNode[] = [
     id: "tide",
     name: "Tide",
     epithet: "ocean world",
-    x: -1360,
-    y: 480,
-    z: 440,
+    x: -2720,
+    y: 960,
+    z: 880,
     ring: "inner",
     video: "/videos/tide.mp4?v=big1",
     poster: "/videos/tide.jpg?v=big1",
@@ -57,9 +57,9 @@ export const NODES: WorldNode[] = [
     id: "canyon",
     name: "Canyon",
     epithet: "scarred world",
-    x: 1480,
-    y: -400,
-    z: -410,
+    x: 2960,
+    y: -800,
+    z: -820,
     ring: "inner",
     video: "/videos/canyon.mp4?v=fill2",
     poster: "/videos/canyon.jpg?v=fill2",
@@ -68,9 +68,9 @@ export const NODES: WorldNode[] = [
     id: "crystal",
     name: "Crystal",
     epithet: "dormant ice",
-    x: -560,
-    y: -1440,
-    z: 290,
+    x: -1120,
+    y: -2880,
+    z: 580,
     ring: "inner",
     video: "/videos/crystal.mp4?v=nohalo",
     poster: "/videos/crystal.jpg?v=nohalo",
@@ -79,9 +79,9 @@ export const NODES: WorldNode[] = [
     id: "hollow",
     name: "Hollow",
     epithet: "quiet vein",
-    x: -1960,
-    y: 1520,
-    z: -520,
+    x: -4310,
+    y: 3340,
+    z: -1140,
     ring: "outer",
     video: "/videos/hollow.mp4?v=spin-slow",
     poster: "/videos/hollow.jpg?v=spin-slow",
@@ -90,9 +90,9 @@ export const NODES: WorldNode[] = [
     id: "drift",
     name: "Drift",
     epithet: "ash world",
-    x: 2160,
-    y: 1280,
-    z: 580,
+    x: 4750,
+    y: 2820,
+    z: 1280,
     ring: "outer",
     video: "/videos/drift.mp4?v=spin-slow",
     poster: "/videos/drift.jpg?v=spin-slow",
@@ -126,7 +126,7 @@ export function constellationBounds() {
     maxX = Math.max(maxX, n.x);
     maxY = Math.max(maxY, n.y);
   }
-  const pad = VIDEO_SIZE * 1.2;
+  const pad = VIDEO_SIZE * 2.2;
   return { minX: minX - pad, minY: minY - pad, maxX: maxX + pad, maxY: maxY + pad };
 }
 

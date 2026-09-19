@@ -63,7 +63,7 @@ node scripts/imagine-planet-hooks.mjs           # all six
 | Kind | Worlds | First | Last | Motion |
 |------|--------|-------|------|--------|
 | **spin** | Tide, Canyon, Crystal, Hollow, Drift | globe still | **distinct** still, small yaw | slow axis turn |
-| **breath** | Star Core | core still | **same** still | corona pulse, **filaments stay**, photosphere never changes size. Then `lock_globe --star` (keep corona) → RIFE 4× → ping-pong. |
+| **breath** | Star Core | core still | **distinct** still (~18° yaw / boiled granulation of the SAME star) | photosphere **heart boils and crawls**, filaments wave, size locked. Shader adds a slow yaw + boil so the heart never sits as a photo. Then `lock_globe --star` → ping-pong. |
 
 If first = last on a planet, Imagine holds still. Spin **must** be two different stills of the **same** globe.
 
@@ -127,6 +127,12 @@ RIFE on an unlocked clip **amplifies** zoom. Lock first.
 ## Live plates
 
 `public/videos/` — `core`, `tide`, `canyon`, `crystal`, `hollow`, `drift` (`.mp4` + `.jpg` poster). Cache-bust in `world.ts` (`?v=…`) when a file is replaced so mobile browsers do not keep the old loop.
+
+Inner worlds sit ~2× farther from Core than the first KEEP; outer worlds ~2.2×. Gaps are the product.
+
+## Sky (the void, not the planets)
+
+Plates in `public/sky/`: `nebula-far.jpg`, `milky.jpg` (center darkened so it does not fight Star Core), `nebula-near.jpg`. `Starfield.tsx` draws them with parallax + more stars, diffraction spikes, faint galaxies, veils, meteors. No second sun. No collage.
 
 ## Do not
 
