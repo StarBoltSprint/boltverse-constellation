@@ -17,11 +17,11 @@ export interface ImpostorCfg {
 /** Disc in the Imagine plate + palette for the far-side wrap. */
 export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   core: {
-    source: 0.205,
-    halo: 0.40,
-    cx: 0.5,
-    cy: 0.5,
-    parallax: 0.04,
+    source: 0.38,
+    halo: 0.49,
+    cx: 0.51,
+    cy: 0.48,
+    parallax: 0.03,
     kind: 0,
     a: [0.72, 0.32, 0.05],
     b: [1.0, 0.68, 0.18],
@@ -29,10 +29,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     seed: 11.2,
   },
   tide: {
-    source: 0.255,
-    halo: 0.38,
-    cx: 0.48,
-    cy: 0.47,
+    source: 0.42,
+    halo: 0.49,
+    cx: 0.491,
+    cy: 0.493,
     parallax: 0.07,
     kind: 1,
     a: [0.05, 0.22, 0.42],

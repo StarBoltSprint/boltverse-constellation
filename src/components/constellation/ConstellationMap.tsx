@@ -16,9 +16,9 @@ import {
   LINKS,
   NODES,
   NODE_BY_ID,
-  ORB_HIT_RADIUS,
   panLimit,
   VIDEO_SIZE,
+  plateSize,
   zoomLimits,
   type NodeId,
   type WorldNode,
@@ -71,7 +71,7 @@ function nearestNode(
   let any = false;
   for (const n of NODES) {
     const p = proj[n.id] ?? n;
-    const vis = IMPOSTOR[n.id].source * VIDEO_SIZE * (p.s ?? 1);
+    const vis = IMPOSTOR[n.id].source * plateSize(n.id) * (p.s ?? 1);
     const dx = Math.abs(p.x - cam.x);
     const dy = Math.abs(p.y - cam.y);
     if (dx > halfW + vis || dy > halfH + vis) continue;
@@ -103,7 +103,7 @@ function hitNode(
     if (nodeOpacity(n, zoom, minZ, maxZ) < 0.35) continue;
     const p = proj[n.id] ?? n;
     const d = dist(p.x, p.y, wx, wy);
-    const radius = ORB_HIT_RADIUS * (p.s ?? 1);
+    const radius = plateSize(n.id) * 0.28 * (p.s ?? 1);
     if (d < radius && d < bestD) {
       bestD = d;
       best = n;
@@ -267,9 +267,10 @@ export function ConstellationMap() {
       if (!el) continue;
       const p = proj[n.id]!;
       const o = nodeOpacity(n, cam.zoom, minZ, maxZ);
+      const sz = plateSize(n.id);
       el.style.opacity = o < 0.03 ? "0" : String(o);
-      el.style.left = `${p.x - VIDEO_SIZE / 2}px`;
-      el.style.top = `${p.y - VIDEO_SIZE / 2}px`;
+      el.style.left = `${p.x - sz / 2}px`;
+      el.style.top = `${p.y - sz / 2}px`;
       el.style.transform = `scale(${p.s})`;
       el.style.zIndex = String(Math.round(1800 - p.z));
       el.classList.toggle("is-immersed", n.id === immersed);
@@ -346,13 +347,13 @@ export function ConstellationMap() {
           sprites: NODES.map((n) => {
             const p = proj[n.id]!;
             const d = dist(p.x, p.y, cam.x, cam.y);
-            const close = clamp(1 - d / (VIDEO_SIZE * 0.48), 0, 1);
+            const close = clamp(1 - d / (plateSize(n.id) * 0.48), 0, 1);
             return {
               id: n.id,
               x: vw / 2 + (p.x - cam.x) * cam.zoom,
               y: vh / 2 + (p.y - cam.y) * cam.zoom,
               z: p.z,
-              size: VIDEO_SIZE * cam.zoom * p.s,
+              size: plateSize(n.id) * cam.zoom * p.s,
               opacity: nodeOpacity(n, cam.zoom, minZ, maxZ),
               yaw,
               pitch,
@@ -432,6 +433,12 @@ export function ConstellationMap() {
   const startVideos = useCallback(() => {
     const { vw, vh } = limitsRef.current;
     playingRef.current = true;
+    const core = videoRefs.current.core;
+    if (core) {
+      core.muted = true;
+      core.playsInline = true;
+      void core.play()?.catch(() => {});
+    }
     setLive(nearestNode(camRef.current, projRef.current, lastFocusRef.current, vw, vh).id);
   }, [setLive]);
 
@@ -789,7 +796,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
-      data-rev="fill2"
+      data-rev="big1"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}
@@ -865,10 +872,10 @@ export function ConstellationMap() {
             data-node={n.id}
             className={n.id === "core" ? "node-orb is-immersed" : "node-orb"}
             style={{
-              width: VIDEO_SIZE,
-              height: VIDEO_SIZE,
-              left: n.x - VIDEO_SIZE / 2,
-              top: n.y - VIDEO_SIZE / 2,
+              width: plateSize(n.id),
+              height: plateSize(n.id),
+              left: n.x - plateSize(n.id) / 2,
+              top: n.y - plateSize(n.id) / 2,
             }}
           >
             <div

@@ -27,7 +27,7 @@ const WORLDS = {
   tide: {
     kind: "spin",
     paint:
-      "Blue ocean world with a thin bright ring. ONE globe. The globe rotates slowly on its vertical axis inside the ring. The ring stays in the same plane and does not tumble. Water stays water. Clouds drift with the rotation only. Never a second globe. Full disc in frame, black void around the limb. Locked tripod. Same size the whole time.",
+      "Blue ocean world with a thin bright ring. ONE globe filling MOST of the plate — the limb stays close to the edge, about 90 percent of the width. The globe rotates slowly on its vertical axis inside the ring. The ring stays in the same plane and does not tumble. Water stays water. Clouds drift with the rotation only. Never a second globe. Full disc in frame, black void only in the corners. Locked tripod. Same size the whole time. NEVER zoom. NEVER change diameter.",
   },
   canyon: {
     kind: "spin",
@@ -52,7 +52,7 @@ const WORLDS = {
   core: {
     kind: "breath",
     paint:
-      "Golden star photosphere with PERSISTENT coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame. The filaments may shimmer and wave but they NEVER retract, NEVER vanish, NEVER leave a smooth bowling-ball sun. Completely stationary in place. Corona breathes in brightness only. Size of the photosphere never changes — same pixel radius first to last. NO morph into another shape. NO rotation. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame, black void around them.",
+      "Golden star photosphere filling MOST of the plate — the disc occupies about 70 percent of the width. PERSISTENT dense coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame, reaching toward the edges. The filaments WAVE and SHIMMER clearly — living plasma, not a still photo. They NEVER retract, NEVER vanish, NEVER leave a smooth bowling-ball sun. Completely stationary in place. Size of the photosphere never changes — same pixel radius first to last. NO morph. NO rotation. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame.",
   },
 };
 

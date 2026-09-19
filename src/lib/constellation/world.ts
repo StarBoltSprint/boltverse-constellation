@@ -16,6 +16,20 @@ export interface WorldNode {
 /** World-space size of each node's video plate (square). */
 export const VIDEO_SIZE = 1000;
 
+/** Core is the heart — drawn larger than the planets. */
+export const PLATE_SCALE: Record<NodeId, number> = {
+  core: 2.35,
+  tide: 1,
+  canyon: 1,
+  crystal: 1,
+  hollow: 1,
+  drift: 1,
+};
+
+export function plateSize(id: NodeId) {
+  return VIDEO_SIZE * (PLATE_SCALE[id] ?? 1);
+}
+
 export const NODES: WorldNode[] = [
   {
     id: "core",
@@ -25,8 +39,8 @@ export const NODES: WorldNode[] = [
     y: 0,
     z: 0,
     ring: "core",
-    video: "/videos/core.mp4?v=fill2",
-    poster: "/videos/core.jpg?v=fill2",
+    video: "/videos/core.mp4?v=big1",
+    poster: "/videos/core.jpg?v=big1",
   },
   {
     id: "tide",
@@ -36,8 +50,8 @@ export const NODES: WorldNode[] = [
     y: 480,
     z: 440,
     ring: "inner",
-    video: "/videos/tide.mp4?v=fill2",
-    poster: "/videos/tide.jpg?v=fill2",
+    video: "/videos/tide.mp4?v=big1",
+    poster: "/videos/tide.jpg?v=big1",
   },
   {
     id: "canyon",
@@ -112,7 +126,7 @@ export function constellationBounds() {
     maxX = Math.max(maxX, n.x);
     maxY = Math.max(maxY, n.y);
   }
-  const pad = VIDEO_SIZE * 0.55;
+  const pad = VIDEO_SIZE * 1.2;
   return { minX: minX - pad, minY: minY - pad, maxX: maxX + pad, maxY: maxY + pad };
 }
 
@@ -131,4 +145,4 @@ export function zoomLimits(vw: number, vh: number) {
 }
 
 /** World radius of the visible planet orb (not the full video plate). */
-export const ORB_HIT_RADIUS = VIDEO_SIZE * 0.22;
+export const ORB_HIT_RADIUS = VIDEO_SIZE * 0.28;
