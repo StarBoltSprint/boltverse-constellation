@@ -52,7 +52,7 @@ const WORLDS = {
   core: {
     kind: "breath",
     paint:
-      "Golden star photosphere filling MOST of the plate — the disc occupies about 70 percent of the width. The HEART of the star is a living furnace: granulation boils and crawls, never a frozen photo. PERSISTENT dense coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame, reaching toward the edges. Filaments WAVE. Size of the photosphere never changes — same pixel radius first to last. NO morph. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame.",
+      "PERFECTLY ROUND spherical white-hot star core — a glowing ORB, a pulsar, NOT a human heart, NOT an anatomical organ, NOT ventricles, NOT aorta. Huge circular blinding white nucleus already filling the center. Dense branching white lightning plasma tendrils radiate 360 degrees from the ROUND orb toward the edges. Tendrils WAVE and flicker, they NEVER retract. The round nucleus PULSES — never a frozen photo. Same pixel radius first to last. NO morph. NO zoom. Locked tripod. No planets. No second body. No anatomy. Black void only in the far corners.",
   },
 };
 
@@ -162,14 +162,13 @@ function spinLine(paint) {
 
 function breathLine(paint) {
   return [
-    "First frame and last frame are the SAME star at the SAME size, different surface state (already pinned).",
-    "The HEART of the photosphere is ALIVE — not a still photograph. Granulation cells boil, churn, drift and merge. Fire tiles crawl across the disc. The surface simmers the whole time.",
-    "ALSO interpolate a slow axial yaw so the granulation TRAVELS around the sphere.",
-    "Coronal filaments (prominences, plasma loops, brins de lumière) stay around the ENTIRE limb in EVERY frame and WAVE. They NEVER disappear. They NEVER retract into a smooth round ball.",
-    "NO change of size. Same pixel radius of the photosphere the whole time. Same center. Never small then large.",
-    "Camera lock-off. No zoom. No dolly. No push-in. No pull-out. No flyover.",
+    "First frame and last frame are the SAME energy core at the SAME size, different lightning pose (already pinned).",
+    "The HEART is ALIVE — white-hot nucleus pulses, inner fire crawls, never a still photograph.",
+    "Branching lightning tendrils WAVE and flicker around the entire core in EVERY frame. They NEVER disappear. They NEVER retract into a smooth round ball.",
+    "NO change of size. Same pixel radius the whole time. Same center. Never small then large.",
+    "Camera lock-off. No zoom. No dolly. No push-in. No pull-out.",
     paint,
-    "ONE body only. Heart boils. Filaments wave. Size never changes.",
+    "ONE body only. Round white electric orb. Lightning stays. Size never changes. NOT an orange sun. NOT a human heart.",
   ].join(" ");
 }
 

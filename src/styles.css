@@ -92,7 +92,7 @@
 }
 
 [data-sky="core"] {
-  --sky-glow: 255 214 150;
+  --sky-glow: 210 228 255;
 }
 [data-sky="tide"] {
   --sky-glow: 120 198 214;

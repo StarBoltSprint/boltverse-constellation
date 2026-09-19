@@ -160,7 +160,7 @@ export function ConstellationMap() {
     angle: number;
   } | null>(null);
   const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
-  const playingRef = useRef(false);
+  const playingRef = useRef(true);
   const immersedIdRef = useRef<string | null>("core");
   const nameRef = useRef<HTMLParagraphElement>(null);
   const epithetRef = useRef<HTMLParagraphElement>(null);
@@ -188,8 +188,6 @@ export function ConstellationMap() {
     pitch: 0,
     flatten: 1,
   });
-
-  const [playing, setPlaying] = useState(false);
 
   const hideHint = useCallback(() => {
     if (hintRef.current) hintRef.current.style.opacity = "0";
@@ -441,6 +439,12 @@ export function ConstellationMap() {
     }
     setLive(nearestNode(camRef.current, projRef.current, lastFocusRef.current, vw, vh).id);
   }, [setLive]);
+
+  useEffect(() => {
+    startVideos();
+    const t = window.setTimeout(hideHint, 5200);
+    return () => window.clearTimeout(t);
+  }, [startVideos, hideHint]);
 
   useEffect(() => {
     const onVis = () => {
@@ -779,12 +783,6 @@ export function ConstellationMap() {
     };
   }, []);
 
-  const onPlay = () => {
-    setPlaying(true);
-    startVideos();
-    window.setTimeout(hideHint, 5200);
-  };
-
   const span = useMemo(() => {
     const reach = Math.ceil(panLimit() + VIDEO_SIZE * 0.35);
     spanRef.current = { minX: -reach, minY: -reach };
@@ -796,7 +794,7 @@ export function ConstellationMap() {
       ref={rootRef}
       data-sky="core"
       className={`relative h-dvh w-full overflow-hidden bg-bg text-fg touch-none select-none${hasImpostor ? " has-impostor" : ""}`}
-      data-rev="sky1"
+      data-rev="live1"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointer}
@@ -916,8 +914,7 @@ export function ConstellationMap() {
         ))}
       </div>
 
-      {playing ? (
-        <div className="hud-layer pointer-events-none absolute inset-0 flex flex-col justify-between p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+      <div className="hud-layer pointer-events-none absolute inset-0 flex flex-col justify-between p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]">
           <header className="flex flex-col items-center gap-2 text-center">
             <svg
               className="hud-mark"
@@ -979,31 +976,6 @@ export function ConstellationMap() {
             </Button>
           </div>
         </div>
-      ) : (
-        <div className="gate-layer absolute inset-0 flex flex-col items-center justify-end px-6 pb-[max(4.5rem,calc(env(safe-area-inset-bottom)+3.5rem))]">
-          <div className="gate-enter flex w-full max-w-sm flex-col items-center gap-5 text-center">
-            <svg className="hud-mark" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M12 1.8 12.85 11.15 22.2 12 12.85 12.85 12 22.2 11.15 12.85 1.8 12 11.15 11.15Z"
-              />
-            </svg>
-            <p className="text-[11px] tracking-[0.38em] text-muted uppercase">
-              Living map
-            </p>
-            <h1 className="font-display text-5xl font-medium leading-tight tracking-[0.18em] text-fg uppercase text-balance sm:text-6xl">
-              Constellation
-            </h1>
-            <p className="max-w-[16rem] text-sm leading-relaxed text-muted text-pretty">
-              Star Core at the center. Worlds hung in the void. Pinch out, twist
-              to orbit.
-            </p>
-            <Button type="button" size="lg" className="mt-1 min-w-40" onClick={onPlay}>
-              Play
-            </Button>
-          </div>
-        </div>
-      )}
       <div className="vignette absolute inset-0" aria-hidden="true" />
     </div>
   );

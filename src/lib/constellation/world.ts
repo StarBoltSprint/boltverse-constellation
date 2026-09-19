@@ -18,7 +18,7 @@ export const VIDEO_SIZE = 1000;
 
 /** Core is the heart — drawn larger than the planets. */
 export const PLATE_SCALE: Record<NodeId, number> = {
-  core: 2.35,
+  core: 3.55,
   tide: 1,
   canyon: 1,
   crystal: 1,
@@ -39,8 +39,8 @@ export const NODES: WorldNode[] = [
     y: 0,
     z: 0,
     ring: "core",
-    video: "/videos/core.mp4?v=boil1",
-    poster: "/videos/core.jpg?v=boil1",
+    video: "/videos/core.mp4?v=orb1",
+    poster: "/videos/core.jpg?v=orb1",
   },
   {
     id: "tide",

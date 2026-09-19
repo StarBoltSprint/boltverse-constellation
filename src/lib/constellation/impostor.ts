@@ -17,15 +17,15 @@ export interface ImpostorCfg {
 /** Disc in the Imagine plate + palette for the far-side wrap. */
 export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   core: {
-    source: 0.38,
-    halo: 0.49,
-    cx: 0.51,
-    cy: 0.48,
-    parallax: 0.03,
+    source: 0.28,
+    halo: 0.58,
+    cx: 0.504,
+    cy: 0.495,
+    parallax: 0.02,
     kind: 0,
-    a: [0.72, 0.32, 0.05],
-    b: [1.0, 0.68, 0.18],
-    c: [1.0, 0.92, 0.62],
+    a: [0.55, 0.72, 1.0],
+    b: [0.85, 0.92, 1.0],
+    c: [1.0, 0.98, 0.94],
     seed: 11.2,
   },
   tide: {
@@ -187,7 +187,7 @@ void main() {
   float halo0 = uParams.y;
   float para = uParams.z;
   float lod = uParams.w;
-  float halo = uKind < 0.5 ? mix(halo0, 0.52, lod) : halo0;
+  float halo = halo0;
   float isTide = max(uTide, step(0.5, uKind) * (1.0 - step(1.5, uKind)));
 
   vec2 d = vUv - uCenter;
@@ -203,14 +203,6 @@ void main() {
   }
 
   vec2 uv = vUv;
-  if (uKind < 0.5) {
-    // Heart of the star must crawl, not sit as a still.
-    float ang = uTime * 0.16;
-    float ca = cos(ang);
-    float sa = sin(ang);
-    vec2 rd = vUv - uCenter;
-    uv = uCenter + vec2(rd.x * ca - rd.y * sa, rd.x * sa + rd.y * ca);
-  }
   vec4 raw = texture2D(uTex, uv);
 
   vec2 sph = d / max(source, 0.0001);
@@ -245,13 +237,13 @@ void main() {
 
   vec3 rgb = raw.rgb;
   if (uKind < 0.5) {
-    vec3 starFace = mix(raw.rgb, face, twist * 0.4 * (1.0 - lod));
-    // Living furnace: granulation flicker + boil on the heart, not only the limb.
-    float heart = 1.0 - smoothstep(0.0, source * 0.92, pr);
-    starFace += uC * (spark - 0.42) * 0.28 * twist * heart;
-    starFace += uB * (boil - 0.45) * 0.22 * heart;
-    starFace *= 0.92 + spark * 0.16 * heart;
-    rgb = mix(starFace, raw.rgb, lod * 0.55);
+    vec3 starFace = raw.rgb;
+    float heart = 1.0 - smoothstep(0.0, source * 1.15, pr);
+    // Pulse the white nucleus — lightning stays in the video, no rigid spin.
+    starFace += uC * (spark - 0.4) * 0.22 * heart;
+    starFace += uB * (boil - 0.45) * 0.12 * heart;
+    starFace *= 0.9 + spark * 0.22 * heart;
+    rgb = starFace;
   } else {
     rgb = mix(raw.rgb, face, twist * 0.22 * (1.0 - lod) * onBody);
     rgb *= mix(1.0, mix(0.96, 1.04, grain), amt * 0.4 * onBody);
@@ -272,7 +264,7 @@ void main() {
 
   float luma = max(rgb.r, max(rgb.g, rgb.b));
   float window = 1.0 - smoothstep(halo * 0.88, halo, pr);
-  float starA = smoothstep(0.08, 0.22, luma) * window;
+  float starA = smoothstep(0.04, 0.16, luma) * window;
 
   float globe = 1.0 - smoothstep(source * 0.985, source * 1.002, pr);
   // Rings only where the plate is actually lit — never a black cookie.
