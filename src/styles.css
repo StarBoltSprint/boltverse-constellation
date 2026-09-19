@@ -65,9 +65,9 @@
 
 .nebula-far {
   background:
-    radial-gradient(ellipse 58% 42% at 50% 48%, rgb(255 214 150 / 0.07), transparent 58%),
-    radial-gradient(ellipse 78% 52% at 24% 18%, rgb(42 54 96 / 0.3), transparent 66%),
-    radial-gradient(ellipse 64% 48% at 82% 78%, rgb(26 34 62 / 0.26), transparent 70%);
+    radial-gradient(ellipse 58% 42% at 50% 48%, rgb(255 214 150 / 0.1), transparent 58%),
+    radial-gradient(ellipse 78% 52% at 24% 18%, rgb(42 54 96 / 0.38), transparent 66%),
+    radial-gradient(ellipse 64% 48% at 82% 78%, rgb(26 34 62 / 0.32), transparent 70%);
 }
 
 .nebula-near {
@@ -81,9 +81,9 @@
   z-index: 1;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 48% 40% at 50% 46%,
-    rgb(var(--sky-glow, 232 238 248) / 0.12),
-    transparent 70%
+    ellipse 52% 44% at 50% 46%,
+    rgb(var(--sky-glow, 232 238 248) / 0.16),
+    transparent 72%
   );
   mix-blend-mode: screen;
   transition: opacity var(--motion-slow) var(--ease-out);

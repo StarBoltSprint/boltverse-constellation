@@ -33,7 +33,7 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
     halo: 0.46,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.09,
+    parallax: 0.11,
     kind: 1,
     a: [0.05, 0.22, 0.42],
     b: [0.16, 0.48, 0.22],
@@ -42,10 +42,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   canyon: {
     source: 0.312,
-    halo: 0.318,
+    halo: 0.355,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.11,
+    parallax: 0.13,
     kind: 2,
     a: [0.38, 0.14, 0.06],
     b: [0.78, 0.38, 0.16],
@@ -54,7 +54,7 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   crystal: {
     source: 0.13,
-    halo: 0.18,
+    halo: 0.2,
     cx: 0.5,
     cy: 0.5,
     parallax: 0.1,
@@ -66,10 +66,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   hollow: {
     source: 0.17,
-    halo: 0.2,
+    halo: 0.22,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.09,
+    parallax: 0.1,
     kind: 4,
     a: [0.07, 0.08, 0.1],
     b: [0.18, 0.2, 0.24],
@@ -78,10 +78,10 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
   drift: {
     source: 0.09,
-    halo: 0.14,
+    halo: 0.135,
     cx: 0.5,
     cy: 0.5,
-    parallax: 0.1,
+    parallax: 0.11,
     kind: 5,
     a: [0.2, 0.18, 0.16],
     b: [0.42, 0.38, 0.34],
@@ -201,54 +201,73 @@ void main() {
 
   vec2 sph = d / max(source, 0.0001);
   float sr2 = dot(sph, sph);
-  float onBody = 1.0 - smoothstep(0.92, 1.02, sr2);
+  float onBody = 1.0 - smoothstep(0.9, 1.03, sr2);
   float z = sqrt(max(0.0, 1.0 - min(sr2, 1.0)));
   vec3 nCam = normalize(vec3(sph, z));
 
-  float twist = 1.0 - lod * 0.85;
+  float twist = 1.0 - lod * 0.8;
   float yaw = uView.x * twist;
   float pit = uView.y * twist;
 
   vec2 tilt = vec2(sin(yaw), sin(pit)) * para;
   vec2 samp = d + tilt * z * source;
   float sampR = length(samp);
-  float maxR = source * 0.88;
+  float maxR = source * 0.86;
   if (sampR > maxR) samp *= maxR / max(sampR, 0.0001);
   vec3 face = texture2D(uTex, uCenter + samp).rgb;
 
   vec3 nWrap = rotX(rotY(nCam, -yaw * 0.55), -pit * 0.55);
   float grain = fbm(nWrap * 6.0 + vec3(uSeed));
+  float crag = fbm(nWrap * 16.0 + vec3(uSeed * 1.7));
   float spark = fbm(nWrap * 10.0 + vec3(uTime * 0.05));
-  float amt = 0.1 * twist * (1.0 - lod);
+  float amt = 0.12 * twist * (1.0 - lod * 0.5);
   float rawLuma = max(raw.r, max(raw.g, raw.b));
+
+  // Bump from fbm so canyons catch the light (no derivatives — Samsung safe).
+  vec3 t1 = normalize(vec3(-nCam.z, 0.0, nCam.x));
+  vec3 t2 = cross(nCam, t1);
+  nCam = normalize(nCam + (t1 * (grain - 0.5) + t2 * (crag - 0.5)) * 0.55 * onBody);
 
   vec3 rgb = raw.rgb;
   if (uKind < 0.5) {
-    vec3 starFace = mix(raw.rgb, face, twist * 0.35 * (1.0 - lod));
-    starFace += uC * (spark - 0.42) * 0.14 * twist * smoothstep(0.1, 0.28, rawLuma);
-    rgb = mix(starFace, raw.rgb, lod * 0.85);
+    vec3 starFace = mix(raw.rgb, face, twist * 0.4 * (1.0 - lod));
+    starFace += uC * (spark - 0.4) * 0.18 * twist * smoothstep(0.08, 0.26, rawLuma);
+    rgb = mix(starFace, raw.rgb, lod * 0.8);
   } else {
-    rgb = mix(raw.rgb, face, twist * 0.32 * (1.0 - lod) * onBody);
-    rgb *= mix(1.0, mix(0.92, 1.08, grain), amt * onBody);
-    vec3 light = normalize(vec3(-0.38, 0.46, 0.8));
-    float ndl = clamp(dot(nCam, light), 0.0, 1.0);
-    float wrap = clamp(ndl * 0.58 + 0.42, 0.0, 1.0);
-    float fres = pow(clamp(1.0 - nCam.z, 0.0, 1.0), 2.2);
-    vec3 lit = rgb * mix(0.58, 1.14, wrap);
-    lit += uA * fres * 0.22;
-    float spec = pow(max(dot(nCam, normalize(light + vec3(0.0, 0.0, 1.0))), 0.0), 22.0);
-    lit += uC * spec * 0.16 * twist;
+    rgb = mix(raw.rgb, face, twist * 0.38 * (1.0 - lod) * onBody);
+    rgb *= mix(1.0, mix(0.9, 1.12, grain), amt * onBody);
+
+    vec3 key = normalize(vec3(-0.42, 0.5, 0.76));
+    vec3 fill = normalize(vec3(0.55, -0.15, 0.45));
+    float ndl = clamp(dot(nCam, key), 0.0, 1.0);
+    float fillL = clamp(dot(nCam, fill), 0.0, 1.0);
+    float wrap = clamp(ndl * 0.62 + 0.28 + fillL * 0.18, 0.0, 1.15);
+    float fres = pow(clamp(1.0 - nCam.z, 0.0, 1.0), 1.8);
+    vec3 lit = rgb * mix(0.48, 1.18, wrap);
+    lit += mix(uA, uC, 0.4) * fres * 0.32;
+    float specPow = mix(18.0, 42.0, isTide);
+    float spec = pow(max(dot(nCam, normalize(key + vec3(0.0, 0.0, 1.0))), 0.0), specPow);
+    lit += uC * spec * mix(0.14, 0.38, isTide) * twist;
     rgb = mix(rgb, lit, onBody);
   }
 
   float luma = max(rgb.r, max(rgb.g, rgb.b));
-  float window = 1.0 - smoothstep(halo * 0.9, halo, pr);
+  float window = 1.0 - smoothstep(halo * 0.88, halo, pr);
   float starA = smoothstep(0.08, 0.22, luma) * window;
 
-  float globe = 1.0 - smoothstep(source * 0.988, source * 1.01, pr);
+  float globe = 1.0 - smoothstep(source * 0.975, source * 1.008, pr);
   float ring = smoothstep(0.14, 0.30, luma) * (1.0 - smoothstep(halo * 0.86, halo, pr));
   float planetA = mix(globe, max(globe, ring), isTide);
   planetA *= mix(1.0, max(globe, smoothstep(0.05, 0.12, luma)), isTide);
+
+  // Colored air, not a black cookie. Lives just outside the limb.
+  float atmo = smoothstep(source * 0.92, source * 1.01, pr) *
+               (1.0 - smoothstep(source * 1.02, source * 1.12, pr));
+  atmo *= (1.0 - isTide * 0.25);
+  vec3 air = mix(uA, uC, 0.45);
+  float airA = atmo * mix(0.42, 0.22, lod);
+  rgb = mix(rgb, air, atmo * 0.75);
+  planetA = max(planetA, airA);
 
   float a = mix(starA, planetA, step(0.5, uKind)) * uOpacity;
   gl_FragColor = vec4(rgb * a, a);
