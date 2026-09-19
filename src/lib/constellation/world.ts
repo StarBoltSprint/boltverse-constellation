@@ -39,8 +39,8 @@ export const NODES: WorldNode[] = [
     y: 0,
     z: 0,
     ring: "core",
-    video: "/videos/core.mp4?v=big1",
-    poster: "/videos/core.jpg?v=big1",
+    video: "/videos/core.mp4?v=boil1",
+    poster: "/videos/core.jpg?v=boil1",
   },
   {
     id: "tide",

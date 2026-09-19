@@ -202,7 +202,16 @@ void main() {
     return;
   }
 
-  vec4 raw = texture2D(uTex, vUv);
+  vec2 uv = vUv;
+  if (uKind < 0.5) {
+    // Heart of the star must crawl, not sit as a still.
+    float ang = uTime * 0.16;
+    float ca = cos(ang);
+    float sa = sin(ang);
+    vec2 rd = vUv - uCenter;
+    uv = uCenter + vec2(rd.x * ca - rd.y * sa, rd.x * sa + rd.y * ca);
+  }
+  vec4 raw = texture2D(uTex, uv);
 
   vec2 sph = d / max(source, 0.0001);
   float sr2 = dot(sph, sph);
@@ -215,7 +224,7 @@ void main() {
   float pit = uView.y * twist;
 
   vec2 tilt = vec2(sin(yaw), sin(pit)) * para;
-  vec2 samp = d + tilt * z * source;
+  vec2 samp = (uv - uCenter) + tilt * z * source;
   float sampR = length(samp);
   float maxR = source * 0.86;
   if (sampR > maxR) samp *= maxR / max(sampR, 0.0001);
@@ -224,7 +233,8 @@ void main() {
   vec3 nWrap = rotX(rotY(nCam, -yaw * 0.55), -pit * 0.55);
   float grain = fbm(nWrap * 6.0 + vec3(uSeed));
   float crag = fbm(nWrap * 16.0 + vec3(uSeed * 1.7));
-  float spark = fbm(nWrap * 10.0 + vec3(uTime * 0.05));
+  float spark = fbm(nWrap * 10.0 + vec3(uTime * 0.55));
+  float boil = fbm(nWrap * 22.0 + vec3(uTime * 0.9, uSeed, uTime * 0.4));
   float amt = 0.12 * twist * (1.0 - lod * 0.5);
   float rawLuma = max(raw.r, max(raw.g, raw.b));
 
@@ -236,8 +246,12 @@ void main() {
   vec3 rgb = raw.rgb;
   if (uKind < 0.5) {
     vec3 starFace = mix(raw.rgb, face, twist * 0.4 * (1.0 - lod));
-    starFace += uC * (spark - 0.4) * 0.18 * twist * smoothstep(0.08, 0.26, rawLuma);
-    rgb = mix(starFace, raw.rgb, lod * 0.8);
+    // Living furnace: granulation flicker + boil on the heart, not only the limb.
+    float heart = 1.0 - smoothstep(0.0, source * 0.92, pr);
+    starFace += uC * (spark - 0.42) * 0.28 * twist * heart;
+    starFace += uB * (boil - 0.45) * 0.22 * heart;
+    starFace *= 0.92 + spark * 0.16 * heart;
+    rgb = mix(starFace, raw.rgb, lod * 0.55);
   } else {
     rgb = mix(raw.rgb, face, twist * 0.22 * (1.0 - lod) * onBody);
     rgb *= mix(1.0, mix(0.96, 1.04, grain), amt * 0.4 * onBody);

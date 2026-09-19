@@ -52,7 +52,7 @@ const WORLDS = {
   core: {
     kind: "breath",
     paint:
-      "Golden star photosphere filling MOST of the plate — the disc occupies about 70 percent of the width. PERSISTENT dense coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame, reaching toward the edges. The filaments WAVE and SHIMMER clearly — living plasma, not a still photo. They NEVER retract, NEVER vanish, NEVER leave a smooth bowling-ball sun. Completely stationary in place. Size of the photosphere never changes — same pixel radius first to last. NO morph. NO rotation. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame.",
+      "Golden star photosphere filling MOST of the plate — the disc occupies about 70 percent of the width. The HEART of the star is a living furnace: granulation boils and crawls, never a frozen photo. PERSISTENT dense coronal filaments (prominences, plasma loops, brins de lumière) around the ENTIRE limb in EVERY frame, reaching toward the edges. Filaments WAVE. Size of the photosphere never changes — same pixel radius first to last. NO morph. NO zoom. Locked tripod. Never a second star. Full disc plus filaments always in frame.",
   },
 };
 
@@ -162,14 +162,14 @@ function spinLine(paint) {
 
 function breathLine(paint) {
   return [
-    "Seamless loop. First frame and last frame are the same still (already pinned).",
-    "The photosphere remains COMPLETELY STATIONARY in place. NEVER walking. NEVER shifting. NEVER rotating. NEVER zooming.",
-    "NO change of size. Same pixel radius of the photosphere the whole time. Never small then large.",
-    "Coronal filaments (prominences, plasma loops, brins de lumière) stay around the ENTIRE limb in EVERY frame. They may shimmer and wave in place. They NEVER disappear. They NEVER retract into a smooth round ball.",
-    "Gentle living motion only: pulse of brightness, filament shimmer. NO morph of form. NO silhouette scale change.",
-    "Camera lock-off. Same center. No zoom. No dolly. No push-in. No pull-out.",
+    "First frame and last frame are the SAME star at the SAME size, different surface state (already pinned).",
+    "The HEART of the photosphere is ALIVE — not a still photograph. Granulation cells boil, churn, drift and merge. Fire tiles crawl across the disc. The surface simmers the whole time.",
+    "ALSO interpolate a slow axial yaw so the granulation TRAVELS around the sphere.",
+    "Coronal filaments (prominences, plasma loops, brins de lumière) stay around the ENTIRE limb in EVERY frame and WAVE. They NEVER disappear. They NEVER retract into a smooth round ball.",
+    "NO change of size. Same pixel radius of the photosphere the whole time. Same center. Never small then large.",
+    "Camera lock-off. No zoom. No dolly. No push-in. No pull-out. No flyover.",
     paint,
-    "ONE body only. Filaments stay. Size never changes.",
+    "ONE body only. Heart boils. Filaments wave. Size never changes.",
   ].join(" ");
 }
 
@@ -402,18 +402,30 @@ export async function cookWorld(id, videosDir, { force = false } = {}) {
     pingPong(rife, ping);
     return ping;
   }
-  console.log("clip breath (first=last, filaments stay, no morph, no size change)", id);
+  console.log("clip breath (first+last, heart boils, filaments wave, camera lock, no size change)", id);
+  if (force && existsSync(last)) unlinkSync(last);
+  if (!existsSync(last)) {
+    console.log("still last (evolved granulation / slight yaw)", id);
+    await imagineLastStill({
+      first,
+      dest: last,
+      paint:
+        spec.paint +
+        " Edit: the SAME star, identical size and framing. Photosphere granulation has boiled forward — fire cells have crawled to new positions, like a slow axial yaw of ~18 degrees. Filaments in a new wave pose. Do not zoom. Do not change diameter.",
+    });
+  }
+  const lastMatched = join(kitchen, id + "-last-matched.jpg");
+  matchDisc(last, first, lastMatched);
   const locked = join(kitchen, id + "-locked.mp4");
-  const rife = join(kitchen, id + "-rife.mp4");
   const ping = join(kitchen, id + "-slow-ping.mp4");
   for (let attempt = 0; attempt < 2; attempt++) {
     await imaginePlanetClip({
       first,
-      last: first,
+      last: lastMatched,
       dest,
       kind: "breath",
       paint: spec.paint,
-      seconds: 6,
+      seconds: 10,
     });
     const spread = clipSpread(dest);
     console.log("clip radius spread", spread.toFixed(3), id);
@@ -422,10 +434,8 @@ export async function cookWorld(id, videosDir, { force = false } = {}) {
   }
   console.log("lock photosphere, keep corona", id);
   lockGlobe(dest, locked, ["--star"]);
-  console.log("RIFE 4x slow-mo", id);
-  rifeSlow(locked, rife, 4);
   console.log("ping-pong", id);
-  pingPong(rife, ping);
+  pingPong(locked, ping);
   return ping;
 }
 
