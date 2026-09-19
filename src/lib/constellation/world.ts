@@ -25,8 +25,8 @@ export const NODES: WorldNode[] = [
     y: 0,
     z: 0,
     ring: "core",
-    video: "/videos/core.mp4",
-    poster: "/videos/core.jpg",
+    video: "/videos/core.mp4?v=spin-slow",
+    poster: "/videos/core.jpg?v=spin-slow",
   },
   {
     id: "tide",
@@ -36,8 +36,8 @@ export const NODES: WorldNode[] = [
     y: 480,
     z: 440,
     ring: "inner",
-    video: "/videos/tide.mp4",
-    poster: "/videos/tide.jpg",
+    video: "/videos/tide.mp4?v=spin-slow",
+    poster: "/videos/tide.jpg?v=spin-slow",
   },
   {
     id: "canyon",
@@ -47,8 +47,8 @@ export const NODES: WorldNode[] = [
     y: -400,
     z: -410,
     ring: "inner",
-    video: "/videos/canyon.mp4",
-    poster: "/videos/canyon.jpg",
+    video: "/videos/canyon.mp4?v=spin-slow",
+    poster: "/videos/canyon.jpg?v=spin-slow",
   },
   {
     id: "crystal",
@@ -58,8 +58,8 @@ export const NODES: WorldNode[] = [
     y: -1440,
     z: 290,
     ring: "inner",
-    video: "/videos/crystal.mp4",
-    poster: "/videos/crystal.jpg",
+    video: "/videos/crystal.mp4?v=spin-slow",
+    poster: "/videos/crystal.jpg?v=spin-slow",
   },
   {
     id: "hollow",
@@ -69,8 +69,8 @@ export const NODES: WorldNode[] = [
     y: 1520,
     z: -520,
     ring: "outer",
-    video: "/videos/hollow.mp4",
-    poster: "/videos/hollow.jpg",
+    video: "/videos/hollow.mp4?v=spin-slow",
+    poster: "/videos/hollow.jpg?v=spin-slow",
   },
   {
     id: "drift",
@@ -80,8 +80,8 @@ export const NODES: WorldNode[] = [
     y: 1280,
     z: 580,
     ring: "outer",
-    video: "/videos/drift.mp4",
-    poster: "/videos/drift.jpg",
+    video: "/videos/drift.mp4?v=spin-slow",
+    poster: "/videos/drift.jpg?v=spin-slow",
   },
 ];
 

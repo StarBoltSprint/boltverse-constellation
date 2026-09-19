@@ -32,6 +32,23 @@ It is **not** Odyssey. It is **not** Pack. It is **not** biome/master.
 | hollow | Hollow | quiet vein |
 | drift | Drift | ash world |
 
-## Intent
+## Imagine films — Law 0 (from Odyssey, KEEP-only copy)
 
-A living map you fly through — not a menu of videos.
+**ALWAYS** cook with the Odyssey hook: **first frame + last frame** (`scripts/imagine-planet-hooks.mjs` → API `image` + `last_frame`).
+
+Never chat Imagine without `last_frame`. Never `image_to_video` on one still for a spin.
+
+The prompt MUST say, every time:
+
+- **NO morph**
+- **NO change of size** (same pixel radius, first to last)
+- **ONLY a SLOW rotation** of the same body on its own axis (low yaw)
+
+| Kind | First | Last | Motion |
+|------|-------|------|--------|
+| **spin** (Tide, Canyon, Crystal, Hollow, Drift) | world still | **distinct** still of the **same** body, small yaw (~20°) | rigid slow axial turn. **NO morph. NO size change.** |
+| **breath** (Star Core) | core still | **same** still | pulse / corona. Body stays put. **NO morph. NO size change. NO rotation.** |
+
+If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
+
+Ping-pong the spin clip (and slow 5×) so the loop does not snap and the turn reads as a real world, not a toupie. Recook max 2 if the body melts, grows, or becomes a second globe.
