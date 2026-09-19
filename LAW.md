@@ -4,6 +4,8 @@ This repository is the **KEEP** of the Star Map.
 
 It is **not** Odyssey. It is **not** Pack. It is **not** biome/master.
 
+Fresh Grok: read [`GROK.md`](GROK.md) then [`METHOD.md`](METHOD.md).
+
 ## KEEP
 
 1. One shared void. Star Core at the center.
@@ -13,7 +15,9 @@ It is **not** Odyssey. It is **not** Pack. It is **not** biome/master.
 5. Worlds are circular / sphere-impostor plates. Billboard facing the camera is allowed.
 6. Twist / parallax crawl is allowed so the player does not see a flat card.
 7. Lightning threads may bind worlds. Focus banner names the world you are looking at.
-8. Mobile-first: pinch, twist, drag. Core / Map gates.
+8. Mobile-first: pinch, twist, drag. Core / Map gates. **No play splash** — land on the map.
+9. A globe on a portrait phone is a **circle**, never an oval. Cap the disc to the short side.
+10. Canyon rocket zoom is Imagine plates + crossfades. No camera cut. Do not recook locked orbital films to fix draw bugs.
 
 ## HARD BAN
 
@@ -41,7 +45,7 @@ Never chat Imagine without `last_frame`. Never `image_to_video` on one still for
 The prompt MUST say, every time:
 
 - **CAMERA LOCKED** — tripod bolted. Never pans, tilts, zooms, dollies, pushes in, pulls out, or flys over the surface. Framing never changes.
-- **FULL disc always visible** — black void around the limb. Never a close-up. Never terrain filling the frame.
+- **FULL disc always visible** — black void around the limb. Never a close-up. Never terrain filling the frame. (LOD2/LOD3 surface plates are the exception: they *are* terrain, still camera-locked, no morph, no size change.)
 - **NO morph**
 - **NO change of size** (same pixel radius, first to last)
 - **ONE body only** — never a second globe, never a nested planet, never a moon
@@ -50,15 +54,14 @@ The prompt MUST say, every time:
 | Kind | First | Last | Motion |
 |------|-------|------|--------|
 | **spin** (Tide, Canyon, Crystal, Hollow, Drift) | world still | **distinct** still of the **same** body, small yaw (~15°) | rigid slow axial turn. **NO morph. NO size change. NO camera move. ONE body.** |
-| **breath** (Star Core) | core still | **same** still | pulse / filament shimmer. Photosphere stays put. **Filaments stay in every frame. NO morph. NO size change. NO rotation.** |
+| **breath** (Star Core) | core still | **same** still | pulse / filament shimmer. Photosphere stays put. **Filaments stay in every frame. NO morph. NO size change. NO rotation.** Round **orb**, not an anatomical heart. |
 
 If first = last on a planet, Imagine holds still (breath). Spin **must** be two different stills of the same globe.
 
 Last still is size-matched to the first still before the video call (same disc radius — Imagine cannot interpolate a zoom). Reject last stills that are close-ups. Recook the clip if radius spread > 12%. After Imagine: **lock globe**, then **RIFE 4×**, then ping-pong. Recook max 2 if the body melts, grows, or becomes a second globe.
 
-Full method (impostor disc, lock_globe, RIFE, recook commands): [`METHOD.md`](METHOD.md).
+Full method (impostor disc, lock_globe, RIFE, LOD, recook commands): [`METHOD.md`](METHOD.md).
 
 ## Silhouette
 
 Planets are a **geometric disc**. Do not luma-key the interior (that eats the night side and breaks the circle). Star Core may keep a soft corona.
-

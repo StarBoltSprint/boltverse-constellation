@@ -1,4 +1,4 @@
-import { NODES, type NodeId } from "./world";
+import { LOD1, LOD2, LOD3, lod1Id, lod2Id, lod3Id, NODES, type NodeId } from "./world";
 
 export interface ImpostorCfg {
   source: number;
@@ -90,6 +90,21 @@ export const IMPOSTOR: Record<NodeId, ImpostorCfg> = {
   },
 };
 
+export const LOD1_IMPOSTOR: Partial<Record<NodeId, ImpostorCfg>> = {
+  canyon: {
+    source: 0.455,
+    halo: 0.46,
+    cx: 0.508,
+    cy: 0.492,
+    parallax: 0.04,
+    kind: 2,
+    a: [0.38, 0.14, 0.06],
+    b: [0.78, 0.38, 0.16],
+    c: [0.9, 0.72, 0.48],
+    seed: 8.1,
+  },
+};
+
 export interface ImpostorSprite {
   id: NodeId;
   x: number;
@@ -100,6 +115,12 @@ export interface ImpostorSprite {
   yaw: number;
   pitch: number;
   lod: number;
+  /** Texture key if not the orbital loop. */
+  tex?: string;
+  /** 0..1 multiplier on baked parallax (freeze during LOD fade). */
+  para?: number;
+  /** Full-plate landscape — no sphere disc. */
+  flat?: boolean;
 }
 
 export interface ImpostorFrame {
@@ -112,8 +133,10 @@ export interface ImpostorFrame {
 const VERT = `
 attribute vec2 aPos;
 varying vec2 vUv;
+uniform vec4 uUvRect;
 void main() {
-  vUv = aPos * 0.5 + 0.5;
+  vec2 unit = aPos * 0.5 + 0.5;
+  vUv = uUvRect.xy + unit * uUvRect.zw;
   gl_Position = vec4(aPos, 0.0, 1.0);
 }
 `;
@@ -133,6 +156,7 @@ uniform float uTime;
 uniform vec3 uA;
 uniform vec3 uB;
 uniform vec3 uC;
+uniform float uFlat;
 
 float hash31(vec3 p) {
   p = fract(p * vec3(0.1031, 0.1030, 0.0973));
@@ -183,6 +207,12 @@ vec3 rotX(vec3 p, float a) {
 }
 
 void main() {
+  if (uFlat > 0.5) {
+    vec3 rgb = texture2D(uTex, vUv).rgb;
+    float a = uOpacity;
+    gl_FragColor = vec4(rgb * a, a);
+    return;
+  }
   float source = uParams.x;
   float halo0 = uParams.y;
   float para = uParams.z;
@@ -320,6 +350,7 @@ export function createImpostorLayer(
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
   const uTex = gl.getUniformLocation(prog, "uTex");
+  const uUvRect = gl.getUniformLocation(prog, "uUvRect");
   const uView = gl.getUniformLocation(prog, "uView");
   const uCenter = gl.getUniformLocation(prog, "uCenter");
   const uParams = gl.getUniformLocation(prog, "uParams");
@@ -331,6 +362,7 @@ export function createImpostorLayer(
   const uA = gl.getUniformLocation(prog, "uA");
   const uB = gl.getUniformLocation(prog, "uB");
   const uC = gl.getUniformLocation(prog, "uC");
+  const uFlat = gl.getUniformLocation(prog, "uFlat");
   gl.uniform1i(uTex, 0);
 
   const textures: Record<string, WebGLTexture> = {};
@@ -358,10 +390,27 @@ export function createImpostorLayer(
   };
 
   let loaded = 0;
-  for (const n of NODES) {
+  const posters: Array<{ key: string; src: string }> = NODES.map((n) => ({
+    key: n.id,
+    src: n.poster,
+  }));
+  for (const id of Object.keys(LOD1) as NodeId[]) {
+    const extra = LOD1[id];
+    if (extra) posters.push({ key: lod1Id(id), src: extra.poster });
+  }
+  for (const id of Object.keys(LOD2) as NodeId[]) {
+    const extra = LOD2[id];
+    if (extra) posters.push({ key: lod2Id(id), src: extra.poster });
+  }
+  for (const id of Object.keys(LOD3) as NodeId[]) {
+    const extra = LOD3[id];
+    if (extra) posters.push({ key: lod3Id(id), src: extra.poster });
+  }
+  const need = posters.length;
+  for (const p of posters) {
     const t = makeTex();
     if (!t) continue;
-    textures[n.id] = t;
+    textures[p.key] = t;
     const img = new Image();
     img.decoding = "async";
     img.onload = () => {
@@ -373,13 +422,13 @@ export function createImpostorLayer(
         /* tainted */
       }
       loaded += 1;
-      if (loaded >= NODES.length) onReady?.();
+      if (loaded >= need) onReady?.();
     };
     img.onerror = () => {
       loaded += 1;
-      if (loaded >= NODES.length) onReady?.();
+      if (loaded >= need) onReady?.();
     };
-    img.src = n.poster;
+    img.src = p.src;
   }
 
   const uploadVideo = (id: string, video: HTMLVideoElement) => {
@@ -399,9 +448,14 @@ export function createImpostorLayer(
   gl.clearColor(0, 0, 0, 0);
 
   const draw = (frame: ImpostorFrame, videos: Record<string, HTMLVideoElement | null>) => {
+    const cssW = Math.max(1, canvas.clientWidth || frame.vw);
+    const cssH = Math.max(1, canvas.clientHeight || frame.vh);
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const w = Math.max(1, Math.floor(frame.vw * dpr));
-    const h = Math.max(1, Math.floor(frame.vh * dpr));
+    const w = Math.max(1, Math.floor(cssW * dpr));
+    const h = Math.max(1, Math.floor(cssH * dpr));
+    const sx = cssW / Math.max(frame.vw, 1);
+    const sy = cssH / Math.max(frame.vh, 1);
+    const sxy = Math.min(sx, sy);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
@@ -414,31 +468,62 @@ export function createImpostorLayer(
     if (frame.liveId && frame.liveId !== "core" && videos[frame.liveId]) {
       uploadVideo(frame.liveId, videos[frame.liveId]!);
     }
+    const lodLive = frame.liveId ? lod1Id(frame.liveId as NodeId) : null;
+    if (lodLive && videos[lodLive]) uploadVideo(lodLive, videos[lodLive]!);
+    const lod2Live = frame.liveId ? lod2Id(frame.liveId as NodeId) : null;
+    if (lod2Live && videos[lod2Live]) uploadVideo(lod2Live, videos[lod2Live]!);
+    const lod3Live = frame.liveId ? lod3Id(frame.liveId as NodeId) : null;
+    if (lod3Live && videos[lod3Live]) uploadVideo(lod3Live, videos[lod3Live]!);
 
     const tSec = performance.now() * 0.001;
     const sprites = frame.sprites.slice().sort((a, b) => b.z - a.z);
     for (const s of sprites) {
       if (s.opacity < 0.03 || s.size < 8) continue;
-      const tex = textures[s.id];
+      const texKey = s.tex ?? s.id;
+      const tex = textures[texKey];
       if (!tex) continue;
-      const cfg = IMPOSTOR[s.id];
-      const px = s.x * dpr;
-      const py = s.y * dpr;
-      const sz = s.size * dpr;
+      const cfg =
+        s.tex && s.tex.endsWith("-lod1")
+          ? (LOD1_IMPOSTOR[s.id] ?? IMPOSTOR[s.id])
+          : IMPOSTOR[s.id];
+      const px = s.x * sx * dpr;
+      const py = s.y * sy * dpr;
+      const sz = s.flat ? Math.max(w, h) * 1.02 : s.size * sxy * dpr;
       const x0 = px - sz / 2;
       const y0 = h - (py + sz / 2);
-      if (x0 + sz < 0 || y0 + sz < 0 || x0 > w || y0 > h) continue;
+      if (!s.flat && (x0 + sz < 0 || y0 + sz < 0 || x0 > w || y0 > h)) continue;
 
-      gl.viewport(
-        Math.floor(x0),
-        Math.floor(y0),
-        Math.max(1, Math.floor(sz)),
-        Math.max(1, Math.floor(sz)),
-      );
+      if (s.flat) {
+        gl.viewport(0, 0, w, h);
+        gl.uniform4f(uUvRect, 0, 0, 1, 1);
+      } else {
+        const clipL = Math.max(0, x0);
+        const clipB = Math.max(0, y0);
+        const clipR = Math.min(w, x0 + sz);
+        const clipT = Math.min(h, y0 + sz);
+        const vwPx = clipR - clipL;
+        const vhPx = clipT - clipB;
+        if (vwPx < 1 || vhPx < 1) continue;
+
+        gl.viewport(
+          Math.floor(clipL),
+          Math.floor(clipB),
+          Math.max(1, Math.floor(vwPx)),
+          Math.max(1, Math.floor(vhPx)),
+        );
+        gl.uniform4f(
+          uUvRect,
+          (clipL - x0) / sz,
+          (clipB - y0) / sz,
+          vwPx / sz,
+          vhPx / sz,
+        );
+      }
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.uniform2f(uView, s.yaw, s.pitch);
       gl.uniform2f(uCenter, cfg.cx, cfg.cy);
-      gl.uniform4f(uParams, cfg.source, cfg.halo, cfg.parallax, s.lod);
+      const para = cfg.parallax * (s.para ?? 1);
+      gl.uniform4f(uParams, cfg.source, cfg.halo, para, s.lod);
       gl.uniform1f(uOpacity, s.opacity);
       gl.uniform1f(uKind, cfg.kind);
       gl.uniform1f(uTide, s.id === "tide" ? 1.0 : 0.0);
@@ -447,6 +532,7 @@ export function createImpostorLayer(
       gl.uniform3f(uA, cfg.a[0], cfg.a[1], cfg.a[2]);
       gl.uniform3f(uB, cfg.b[0], cfg.b[1], cfg.b[2]);
       gl.uniform3f(uC, cfg.c[0], cfg.c[1], cfg.c[2]);
+      gl.uniform1f(uFlat, s.flat ? 1.0 : 0.0);
       if (cfg.kind < 0.5) gl.blendFunc(gl.ONE, gl.ONE);
       else gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

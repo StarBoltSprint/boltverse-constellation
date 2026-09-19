@@ -1,6 +1,8 @@
 # How this constellation was made
 
-KEEP-only. Not Odyssey. Copy of the method so anyone can recook a world without guessing.
+KEEP-only. Not Odyssey. Copy of the method so anyone (or a fresh Grok) can recook a world without guessing.
+
+**Read [`GROK.md`](GROK.md) first** — product, bugs already paid for, LOD, Samsung.
 
 ## The product
 
@@ -10,17 +12,19 @@ One void. Star Core in the middle. Five worlds hung in space.
 - **Zoom out** → planets as circular plates with void between them.
 - **No collage.** No grid. No rectangles.
 - Imagine videos **face the camera** (billboard). A small twist / parallax crawl is allowed so they do not read as flat cards.
+- **Canyon only:** keep pinching → round globe stays round → one fade into aerial canyon (LOD2) → later oblique flyover (LOD3). No camera cut.
 
 Code:
 
 | Piece | File |
 |-------|------|
-| Map, pinch, twist, Core/Map | `src/components/constellation/ConstellationMap.tsx` |
+| Map, pinch, twist, LOD, Core/Map | `src/components/constellation/ConstellationMap.tsx` |
 | Void stars | `src/components/constellation/Starfield.tsx` |
-| World positions + video URLs | `src/lib/constellation/world.ts` |
-| Camera / yaw-pitch | `src/lib/constellation/camera.ts` |
-| Sphere impostor (the round mask) | `src/lib/constellation/impostor.ts` |
+| World positions + video URLs + LOD alphas | `src/lib/constellation/world.ts` |
+| Camera / yaw-pitch / pinch tame | `src/lib/constellation/camera.ts` |
+| Sphere impostor (the round mask) + flat plates | `src/lib/constellation/impostor.ts` |
 | Law | `LAW.md` |
+| Fresh-Grok handoff | `GROK.md` |
 
 ## Why a planet looks round
 
@@ -34,6 +38,8 @@ The Imagine plate is a **square video**. The app draws it with a WebGL **sphere 
 Canyon `source` sits **inside** the painted globe so a leftover halo cannot show as a crescent on the rim.
 
 Star Core still uses a **soft luma corona** (it is a star, not a hard limb).
+
+On a portrait phone the disc **must stay a circle**. Cap diameter to `0.86 × min(vw,vh)`. Size the WebGL canvas from `clientWidth/Height`, never `window.innerHeight` (Samsung URL bar stretches the bitmap into an egg).
 
 ## Law 0 — how a planet film is cooked
 
@@ -85,6 +91,7 @@ Last still is size-matched to the first still **before** the video call. Reject 
 python3 scripts/lock_globe.py --video in.mp4 --output locked.mp4
 python3 scripts/lock_globe.py --measure --video locked.mp4 --output -
 python3 scripts/lock_globe.py --still last.jpg --match-to first.jpg --output last-matched.jpg
+python3 scripts/lock_globe.py --star --video core-in.mp4 --output core-locked.mp4
 ```
 
 ## RIFE — what it actually does
@@ -124,9 +131,24 @@ Imagine clip
 
 RIFE on an unlocked clip **amplifies** zoom. Lock first.
 
+## LOD plates (Canyon)
+
+Not orbital spins. Do **not** run `lock_globe` with `--star` / disc on these — they are terrain plates.
+
+| File | Role | Cook notes |
+|------|------|------------|
+| `canyon.mp4` | LOD0 orbital | Law 0 spin. **Locked. Do not recook unless asked.** |
+| `canyon-lod1.mp4` | closer globe | Law 0, still a full disc. **Locked.** |
+| `canyon-lod2.mp4` | nadir aerial | image-to-image from inner crop of lod1 still (drop vignette), then video, camera lock, no morph, no size change. Drawn `flat` fullscreen. |
+| `canyon-lod3.mp4` | oblique flyover | same identity, camera tilted ~25–40°. Drawn `flat` fullscreen. |
+
+Mix in `world.ts`: `globeU` / `lod0Alpha` / `lod1Alpha` / `lod2Alpha` / `lod3Alpha`. Globe disc is **capped circular**; `u` still grows so the surface fade can start.
+
+Samsung: pause lod0/lod1 when lod2 covers. Pause lod2 when lod3 covers.
+
 ## Live plates
 
-`public/videos/` — `core`, `tide`, `canyon`, `crystal`, `hollow`, `drift` (`.mp4` + `.jpg` poster). Cache-bust in `world.ts` (`?v=…`) when a file is replaced so mobile browsers do not keep the old loop.
+`public/videos/` — `core`, `tide`, `canyon`, `crystal`, `hollow`, `drift` (`.mp4` + `.jpg` poster) plus Canyon `canyon-lod1/2/3`. Cache-bust in `world.ts` (`?v=…`) when a file is replaced so mobile browsers do not keep the old loop.
 
 Inner worlds sit ~2× farther from Core than the first KEEP; outer worlds ~2.2×. Gaps are the product.
 
@@ -140,4 +162,6 @@ Plates in `public/sky/`: `nebula-far.jpg`, `milky.jpg` (center darkened so it do
 - Cook a spin with only one still.
 - Luma-key the interior of a planet disc.
 - Mix a second disc on top of the first (nested globe).
+- Let the globe become an oval (cap + canvas client size).
+- Recook a locked orbital film to fix a shader / pinch bug.
 - Turn the sky into a photo wall.
